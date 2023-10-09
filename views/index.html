@@ -9,16 +9,11 @@
     />
     <div class="text-3xl font-light">{{.Profile.Name}}</div>
   </div>
+
   <div class="text-md opacity-70 px-10 font-extralight sm:px-20 md:px-32">
-    💻
-    <a class="text-pink-400" target="blank" href="https://tremtec.com/"
-      >@tremtec</a
-    >
-    Co-founder, 👨🏽&zwj;🏫 career mentor at
-    <a class="text-pink-400" target="blank" href="https://podcodar.com/"
-      >@podcodar</a
-    >, 🐈 proud cat daddy
+    {{.Description}}
   </div>
+
   <div class="gap-8 grid w-full grid-cols-1 sm:mx-20 sm:grid-cols-2">
     <a
       href="{{.PrimaryBtn}}"
