@@ -17,20 +17,6 @@ type rootProps struct {
 	Profile      github.GitHubUser
 }
 
-func contactURL() string {
-	q := url.Values{}
-	q.Add("subject", "Hi Marco, Let's have a coffee")
-
-	// mailto does not work with spaces as '+'
-	contact := "mailto:marco@tremtec.com?" + strings.ReplaceAll(
-		q.Encode(), "+", "%20",
-	)
-
-	log.Println("Contact Link generated", contact)
-
-	return contact
-}
-
 func rootHandler(c *fiber.Ctx) error {
 	props := rootProps{
 		PrimaryBtn:   contactURL(),
@@ -44,4 +30,18 @@ func rootHandler(c *fiber.Ctx) error {
 
 func root(router fiber.Router) {
 	router.Get("/", rootHandler)
+}
+
+func contactURL() string {
+	q := url.Values{}
+	q.Add("subject", "Hi Marco, Let's have a coffee")
+
+	// mailto does not work with spaces as '+'
+	contact := "mailto:marco@tremtec.com?" + strings.ReplaceAll(
+		q.Encode(), "+", "%20",
+	)
+
+	log.Println("Contact Link generated", contact)
+
+	return contact
 }
