@@ -1,22 +1,20 @@
-package pages
-
-import "github.com/marco-souza/gx/internal/config"
+package config
 
 type MenuItem struct {
 	Href string
 	Name string
 }
 
-type Params struct {
+type PageParams struct {
 	IsEnv     bool
 	Title     string
 	Repo      string
 	MenuItems []MenuItem
 }
 
-var conf = config.Load()
+var conf = Load()
 
-var defaultParams = Params{
+var DefaultPageParams = PageParams{
 	conf.Env == "development",
 	"Marco.labs 🚀",
 	"https://github.com/marco-souza/gx",

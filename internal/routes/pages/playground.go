@@ -1,9 +1,13 @@
 package pages
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+
+	"github.com/marco-souza/gx/internal/config"
+)
 
 func playgroundHandler(c *fiber.Ctx) error {
-	return c.Render("playground", defaultParams)
+	return c.Render("playground", config.DefaultPageParams)
 }
 
 func playground(router fiber.Router) {

@@ -10,11 +10,12 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/marco-souza/gx/internal/config"
 	"github.com/marco-souza/gx/internal/github"
 )
 
 type rootProps struct {
-	Params
+	config.PageParams
 	PrimaryBtn   string
 	SecondaryBtn string
 	Profile      github.GitHubUser
@@ -24,9 +25,9 @@ type rootProps struct {
 func rootHandler(c *fiber.Ctx) error {
 	user := github.User("marco-souza")
 	props := rootProps{
+		PageParams:   config.DefaultPageParams,
 		PrimaryBtn:   contactURL(),
 		SecondaryBtn: "/resume",
-		Params:       defaultParams,
 		Profile:      user,
 		Description:  processBio(user.Bio),
 	}
