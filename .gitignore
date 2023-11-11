@@ -9,3 +9,4 @@ tmp/
 build/
 dist/
 *fiber*
+*_templ.go
