@@ -1,11 +1,12 @@
-# GX - Go fullstack web apps
+# marco.fly.dev - Fullstack Golang webapp
 
 ## Introduction
 
-Welcome to our FullStack Go project! This project showcases a comprehensive web
+Welcome to my FullStack Go project! This project showcases a comprehensive web
 application built using the latest tools and technologies in the industry. Our
 project is designed to be highly extensible and can be easily integrated with
-other technologies such as Tailwind, Hypescript, Alpine.js, and many more.
+other technologies such as Templ, GoFiber, HTMX, Tailwind, Hypescript, and many
+more.
 
 ### HTMX
 
@@ -14,12 +15,14 @@ Powering our modern frontend
 
 ### Golang
 
-📊 <svg width="20" height="20"> <rect x="10" y="10" width="5" height="5" 
-fill="gray" /></svg> GoLand: Powering our backend services
+📊 <svg width="20" height="20">
+<rect x="10" y="10" width="5" height="5"
+fill="gray" /></svg> GoLand: Powering
+our backend services
 
 ## Features
 
-Our FullStack Go project boasts several impressive features, including:
+The FullStack Go project boasts several impressive features, including:
 
 ### HTMX
 
@@ -28,7 +31,7 @@ to create and maintain complex user interfaces. With HTMX, we've been able to
 streamline our development process and deliver a fast, responsive, and highly
 interactive user experience.
 
-### Go Templates
+### Go Templates (a-h/templ)
 
 Our project also leverages Go Templates to render dynamic HTML content. By using
 templates, we can easily generate HTML content based on data from our backend
@@ -38,9 +41,9 @@ services, ensuring consistency across our application's UI.
 
 One of the standout features of our FullStack Go project is its extensibility.
 We've designed the project to be highly modular and adaptable, allowing
-developers to easily integrate new technologies and frameworks as needed. Whether
-you want to add Tailwind for more advanced CSS styling or Hypescript for better
-JavaScript performance, our project is ready to accommodate your needs.
+developers to easily integrate new technologies and frameworks as needed.
+Whether you want to add Tailwind for more advanced CSS styling or Hypescript for
+better JavaScript performance, our project is ready to accommodate your needs.
 
 ### Security
 
@@ -62,8 +65,8 @@ frameworks such as Gin for our web framework and Revel for our ORM.
 ### Templating Engine
 
 We're using Go Templates (gtemplate.com) to handle dynamic HTML rendering. This
-template engine allows us to generate HTML content based on data from our backend
-services, ensuring consistency across our application's UI.
+template engine allows us to generate HTML content based on data from our
+backend services, ensuring consistency across our application's UI.
 
 ### Frontend Framework
 

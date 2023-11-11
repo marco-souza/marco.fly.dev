@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/marco-souza/gx/cmd/server"
+	"github.com/marco-souza/marco.fly.dev/cmd/server"
 )
 
 func TestCanCreateServer(t *testing.T) {

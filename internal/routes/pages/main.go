@@ -3,7 +3,7 @@ package pages
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/marco-souza/gx/internal/entities"
+	"github.com/marco-souza/marco.fly.dev/internal/entities"
 )
 
 var registers = []entities.Register{

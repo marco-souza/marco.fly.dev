@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/marco-souza/gx/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/config"
 )
 
 func notFound(router fiber.Router) {

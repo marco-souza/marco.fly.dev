@@ -7,7 +7,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/marco-souza/gx/views"
+	"github.com/marco-souza/marco.fly.dev/internal/views"
 )
 
 func now(router fiber.Router) {

@@ -25,5 +25,5 @@ RUN make build
 
 # prdo stage
 FROM base as prod
-COPY --from=build /app/build/gx ./
-CMD ["/app/gx"]
+COPY --from=build /app/build/server ./
+CMD ["/app/server"]

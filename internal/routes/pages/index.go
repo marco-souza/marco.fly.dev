@@ -10,8 +10,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/marco-souza/gx/internal/config"
-	"github.com/marco-souza/gx/internal/github"
+	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
 type rootProps struct {

@@ -8,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 
-	"github.com/marco-souza/gx/internal/config"
-	"github.com/marco-souza/gx/internal/routes"
+	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/routes"
 )
 
 type Server struct {

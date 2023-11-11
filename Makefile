@@ -1,13 +1,17 @@
-run: cmd/gx/main.go
+deps:
+	go install github.com/cosmtrek/air@latest && \
+	go install github.com/a-h/templ/cmd/templ@latest
+
+run: gen cmd/main.go
 	air
 
 deploy: ./fly.toml
 	pkgx fly deploy --now -y
 
-build: cmd/gx/main.go
-	go build -o ./build/gx ./cmd/gx/main.go
+build: cmd/main.go
+	go build -o ./build/server ./cmd/main.go
 
-gen:
+gen: deps
 	templ generate
 
 fmt:
