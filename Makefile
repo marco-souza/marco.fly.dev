@@ -7,6 +7,9 @@ deploy: ./fly.toml
 build: cmd/gx/main.go
 	go build -o ./build/gx ./cmd/gx/main.go
 
+gen:
+	templ generate
+
 fmt:
 	go fmt ./... && \
   bunx prettier -w views ./README.md ./docker-compose.yml
