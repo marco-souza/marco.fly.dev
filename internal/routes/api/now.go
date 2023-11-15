@@ -4,25 +4,18 @@ import (
 	"log"
 	"time"
 
-	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
-
-	"github.com/marco-souza/marco.fly.dev/internal/views"
 )
 
+func nowHandler(c *fiber.Ctx) error {
+	now := time.Now().Format(time.RFC1123Z)
+	log.Println("Now is", now)
+
+	props := fiber.Map{"Time": now}
+
+	return c.Render("partials/now", props, "layouts/empty")
+}
+
 func now(router fiber.Router) {
-	router.Get("/now",
-		func(c *fiber.Ctx) error {
-			now := time.Now().Format(time.RFC1123Z)
-			log.Println("Now is", now)
-
-			comp := views.Now(now)
-			handler := templ.Handler(comp)
-
-			return handler.Component.Render(
-				c.Context(),
-				c.Response().BodyWriter(),
-			)
-		},
-	)
+	router.Get("/now", nowHandler)
 }

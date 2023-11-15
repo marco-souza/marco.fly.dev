@@ -3,7 +3,6 @@ module github.com/marco-souza/marco.fly.dev
 go 1.20
 
 require (
-	github.com/a-h/templ v0.2.432
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/gofiber/template/html/v2 v2.0.5
 	github.com/joho/godotenv v1.5.1
