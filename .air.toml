@@ -5,8 +5,8 @@ testdata_dir = "testdata"
 
 [build]
   args_bin = []
-  bin = "./tmp/gx"
-  cmd = "go build -o ./tmp/gx ./cmd/gx/main.go"
+  bin = "./tmp/server"
+  cmd = "go build -o ./tmp/server ./cmd/main.go"
   include_ext = ["go", "tpl", "tmpl", "html"]
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_regex = ["(\\.null-ls.*|_test)\\.go"]
