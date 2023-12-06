@@ -6,6 +6,8 @@ require (
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/gofiber/template/html/v2 v2.0.5
 	github.com/joho/godotenv v1.5.1
+	gorm.io/driver/sqlite v1.5.4
+	gorm.io/gorm v1.25.5
 )
 
 require (
@@ -24,7 +26,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.50.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-	gorm.io/driver/sqlite v1.5.4 // indirect
-	gorm.io/gorm v1.25.5 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 )

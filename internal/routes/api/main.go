@@ -8,7 +8,6 @@ import (
 
 var registers = []entities.Register{
 	now,
-	test,
 	orders,
 }
 
