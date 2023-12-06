@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"fmt"
+	"math/rand"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -20,7 +21,11 @@ func seed(router fiber.Router) {
 		db.Create(&user)
 
 		order := models.Order{
-			Name:   "Corre de natal",
+			Name: "Corre de natal",
+			CoverUrl: fmt.Sprintf(
+				"https://source.unsplash.com/random/?Order&%d",
+				rand.Intn(100),
+			),
 			Author: user,
 		}
 		db.Create(&order)

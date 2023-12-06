@@ -17,6 +17,7 @@ type User struct {
 type Order struct {
 	gorm.Model
 	Name     string
+	CoverUrl string
 	DoneAt   sql.NullTime
 	AuthorID string
 	Author   User
