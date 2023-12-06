@@ -6,7 +6,7 @@ import (
 
 func ordersHandler(c *fiber.Ctx) error {
 	props := fiber.Map{
-		"Title": "Orders List",
+		"Title": "All Orders",
 	}
 	return c.Render("orders", props)
 }

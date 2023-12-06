@@ -1,3 +1,5 @@
+<h3>{{ .Total }} items</h3>
+
 <div class="gap-4 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-4">
   {{range .Orders}}
   <div class="card bg-base-100 shadow-xl image-full">
@@ -9,9 +11,11 @@
     </figure>
     <div class="card-body">
       <h2 class="card-title">{{ .Name }}</h2>
-      <p>Order created by @{{ .Author.Username }}</p>
+      <p class="text-sm text-gray-400">
+        Order created by @{{ .Author.Username }}
+      </p>
       <div class="card-actions justify-end">
-        <button class="btn btn-primary">Add Items</button>
+        <button class="btn btn-outline btn-secondary">Add Items</button>
       </div>
     </div>
   </div>
