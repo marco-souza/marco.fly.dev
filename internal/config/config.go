@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	Hostname string
-	Port     string
-	Env      string // development | production
+	Hostname    string
+	Port        string
+	Env         string // development | production
+	DatabaseUrl string
 }
 
 func Load() *Config {
@@ -17,9 +18,10 @@ func Load() *Config {
 	godotenv.Load()
 
 	return &Config{
-		Hostname: env("HOST", "localhost"),
-		Port:     env("PORT", "3001"),
-		Env:      env("ENV", "development"),
+		Hostname:    env("HOST", "localhost"),
+		Port:        env("PORT", "3001"),
+		Env:         env("ENV", "development"),
+		DatabaseUrl: env("DB_URL", "./test.db"),
 	}
 }
 
