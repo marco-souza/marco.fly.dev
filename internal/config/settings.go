@@ -22,5 +22,6 @@ var DefaultPageParams = PageParams{
 		{"/", "Home"},
 		{"https://marco.deno.dev/blog", "Blog"},
 		{"/playground", "Playground"},
+		{"/orders", "Ordero"},
 	},
 }

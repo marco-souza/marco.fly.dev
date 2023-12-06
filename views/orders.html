@@ -1,0 +1,12 @@
+<div
+  hx-trigger="load"
+  hx-get="/api/orders"
+  hx-swap="innerHTML"
+  hx-target="#content"
+  hx-indicator="#indicator"
+>
+  <h1 class="text-2xl">{{.Title}}</h1>
+
+  <div id="indicator" class="htmx-indicator loading loading-spinner"></div>
+  <div id="content">loading orders...</div>
+</div>
