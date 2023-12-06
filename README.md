@@ -17,7 +17,7 @@ Powering our modern frontend
 
 📊 <svg width="20" height="20">
 <rect x="10" y="10" width="5" height="5"
-fill="gray" /></svg> GoLand: Powering
+fill="gray" /></svg> Golang: Powering
 our backend services
 
 ### HTMX
@@ -40,10 +40,10 @@ Here are some of the technical details behind our FullStack Go project:
 ### Project Strcuture
 
 ```sh
-  internal
-    config   # app configs
-    entities # core entities of the project
-    github   # github service
-    models   # data models (sqlite db)
-    routes   # routing service
+internal
+|- config   # app configs
+|- entities # core entities of the project
+|- github   # github service
+|- models   # data models (sqlite db)
+|- routes   # routing service
 ```
