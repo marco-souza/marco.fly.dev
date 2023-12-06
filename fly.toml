@@ -14,7 +14,6 @@ primary_region = "gru"
   PORT = "8080"
   ENV = "production"
   DB_URL="./test.db"
-  CGO_ENABLED="1" # gorm sqlite3
 
 [http_service]
   internal_port = 8080

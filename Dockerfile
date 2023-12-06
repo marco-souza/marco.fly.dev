@@ -10,7 +10,7 @@ FROM base as pre-build
 COPY go.mod go.sum ./
 RUN go mod tidy
 RUN go mod download
-RUN apk add --no-cache make
+RUN apk add --no-cache make build-base
 
 COPY . .
 
@@ -23,7 +23,7 @@ CMD ["make", "run"]
 FROM pre-build as build
 RUN make build
 
-# prdo stage
+# prod stage
 FROM base as prod
 COPY --from=build /app/build/server ./
 CMD ["/app/server"]

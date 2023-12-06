@@ -9,7 +9,7 @@ deploy: ./fly.toml
 	pkgx fly deploy --now -y
 
 build: cmd/main.go
-	go build -o ./build/server ./cmd/main.go
+	CGO_ENABLED=1 go build -o ./build/server ./cmd/main.go
 
 fmt:
 	go fmt ./... && bunx prettier -w views ./README.md ./docker-compose.yml
