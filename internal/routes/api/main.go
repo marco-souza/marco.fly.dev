@@ -8,6 +8,8 @@ import (
 
 var registers = []entities.Register{
 	now,
+	seed,
+	orders,
 }
 
 func Apply(router fiber.Router) {

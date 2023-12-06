@@ -7,7 +7,7 @@ import (
 )
 
 var registers = []entities.Register{
-	root, playground,
+	root, playground, orders,
 	notFound,
 }
 

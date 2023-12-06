@@ -4,6 +4,7 @@ tmp/
 
 # Ignore config files
 .env
+*.db
 
 # Ignore build artifacts
 build/
