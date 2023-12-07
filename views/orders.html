@@ -1,12 +1,26 @@
-<div
-  hx-trigger="load"
-  hx-get="/api/orders"
-  hx-swap="innerHTML"
-  hx-target="#content"
-  hx-indicator="#indicator"
->
+<div class="flex gap-4 align-center py-4">
   <h1 class="text-2xl">{{.Title}}</h1>
 
-  <div id="indicator" class="htmx-indicator loading loading-spinner"></div>
-  <div id="content">loading orders...</div>
+  <button class="btn btn-sm" onclick="create_dialog.showModal()">
+    + Order
+  </button>
 </div>
+
+<dialog id="create_dialog" class="modal modal-middle">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+        ✕
+      </button>
+    </form>
+
+    <h3 class="font-bold text-lg">Hello!</h3>
+    <p class="py-4">Press ESC key or click on ✕ button to close</p>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<div id="content">{{template "partials/order-list" .}}</div>
