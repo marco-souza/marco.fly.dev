@@ -24,11 +24,12 @@ type CreateOrderInput struct {
 
 func createOrderHandler(c *fiber.Ctx) error {
 	input := CreateOrderInput{}
-
 	if err := c.BodyParser(&input); err != nil {
 		fmt.Println("error = ", err)
 		return c.SendStatus(400)
 	}
+
+	fmt.Println("input: {?:}", input)
 
 	db := models.Connect()
 
