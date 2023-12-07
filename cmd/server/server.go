@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/template/html/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/models"
 	"github.com/marco-souza/marco.fly.dev/internal/routes"
 )
 
@@ -47,7 +48,11 @@ func New() *Server {
 }
 
 func (s *Server) Start() {
+	fmt.Println("setting up routes...")
 	s.setupRoutes()
+
+	fmt.Println("seeding db...")
+	models.Seed()
 
 	log.Fatal(s.app.Listen(s.addr))
 }

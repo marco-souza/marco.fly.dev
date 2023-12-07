@@ -25,7 +25,6 @@ type Order struct {
 
 type Item struct {
 	gorm.Model
-	Name      string
 	Quantity  float64
 	Recipient string
 	ProductID string
