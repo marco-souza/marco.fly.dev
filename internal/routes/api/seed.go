@@ -20,11 +20,14 @@ func seed(router fiber.Router) {
 		db := models.Connect()
 		db.Create(&user)
 
+		name := "Corre de natal"
 		order := models.Order{
-			Name: "Corre de natal",
+			Name: name,
 			CoverUrl: fmt.Sprintf(
-				"https://source.unsplash.com/random/?Order&%d",
+				"https://source.unsplash.com/random/?%s&%d&w=%d",
+				name,
 				rand.Intn(100),
+				250,
 			),
 			Author: user,
 		}
