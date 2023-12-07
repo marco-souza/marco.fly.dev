@@ -6,7 +6,11 @@
   </button>
 </div>
 
-<dialog id="create_dialog" class="modal modal-middle">
+<dialog
+  id="create_dialog"
+  class="modal modal-middle"
+  _="on htmx:afterRequest close() me"
+>
   <div class="modal-box">
     <form method="dialog">
       <button
@@ -22,16 +26,16 @@
     <form
       hx-post="/api/orders"
       hx-target="#content"
-      onsubmit="create_dialog.close()"
+      _="on htmx:afterRequest reset() me"
     >
       <div class="label">
         <span class="label-text">Enter a name</span>
       </div>
       <input
+        type="text"
         name="name"
         placeholder="Type a name"
         class="input input-bordered w-full max-w-xs"
-        type="text"
       />
       <button class="btn" type="submit">Create Order</button>
     </form>
