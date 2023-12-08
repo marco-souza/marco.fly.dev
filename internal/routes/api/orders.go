@@ -61,7 +61,7 @@ func createOrderHandler(c *fiber.Ctx) error {
 	}
 	db.Create(&order)
 
-	return RenderOrderList(db, c)
+	return renderOrderList(db, c)
 }
 
 func deleteOrderHandler(c *fiber.Ctx) error {
@@ -74,10 +74,10 @@ func deleteOrderHandler(c *fiber.Ctx) error {
 	db := models.Connect()
 	db.Delete(&models.Order{}, orderId)
 
-	return RenderOrderList(db, c)
+	return renderOrderList(db, c)
 }
 
-func RenderOrderList(db *gorm.DB, c *fiber.Ctx) error {
+func renderOrderList(db *gorm.DB, c *fiber.Ctx) error {
 	orders := []models.Order{}
 	result := db.Preload("Author").Find(&orders)
 	props := fiber.Map{"Orders": orders, "Total": result.RowsAffected}
