@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "./**.go"
-      - "./**.yml"
-      - "./**.toml"
+      - "**.go"
+      - "**.yml"
+      - "**.toml"
       - "views/**.html"
       - "static/*"
 
