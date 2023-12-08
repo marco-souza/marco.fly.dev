@@ -9,6 +9,13 @@ import (
 
 var cfg = config.Load()
 
+var tables = []interface{}{
+	&User{},
+	&Order{},
+	&Item{},
+	&Product{},
+}
+
 func Connect() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(cfg.DatabaseUrl), &gorm.Config{})
 	if err != nil {
@@ -16,10 +23,12 @@ func Connect() *gorm.DB {
 	}
 
 	// migrate
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&Order{})
-	db.AutoMigrate(&Item{})
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(tables...)
 
 	return db
+}
+
+func Drop(db *gorm.DB) {
+	migrator := db.Migrator()
+	migrator.DropTable(tables...)
 }
