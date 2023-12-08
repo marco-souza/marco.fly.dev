@@ -4,10 +4,12 @@
 
 - [ ] setup auth (goth, goth_fiber)
 - [ ] handle errors for form validation
+- [ ] add cache for pages
 
 ## Backlog
 
 - [ ] create allowed email to sign-in
+- [ ] improve security
 - [ ] push on tests
 - [ ] add benchmark
 
@@ -17,3 +19,4 @@
 - [x] improve routing
 - [x] improve readme
 - [x] add input validations
+- [x] rate limiter
