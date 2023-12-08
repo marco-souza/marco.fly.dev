@@ -35,10 +35,6 @@ func rootHandler(c *fiber.Ctx) error {
 	return c.Render("index", props)
 }
 
-func root(router fiber.Router) {
-	router.Get("/", rootHandler)
-}
-
 func contactURL() string {
 	q := url.Values{}
 	q.Add("subject", "Hi Marco, Let's have a coffee")

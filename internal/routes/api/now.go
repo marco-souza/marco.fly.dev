@@ -15,7 +15,3 @@ func nowHandler(c *fiber.Ctx) error {
 
 	return c.Render("partials/now", props, "layouts/empty")
 }
-
-func now(router fiber.Router) {
-	router.Get("/now", nowHandler)
-}

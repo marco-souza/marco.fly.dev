@@ -28,7 +28,3 @@ func ordersHandler(c *fiber.Ctx) error {
 
 	return c.Render("orders", props)
 }
-
-func orders(router fiber.Router) {
-	router.Get("/orders", ordersHandler)
-}

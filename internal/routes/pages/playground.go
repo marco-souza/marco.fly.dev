@@ -9,7 +9,3 @@ import (
 func playgroundHandler(c *fiber.Ctx) error {
 	return c.Render("playground", config.DefaultPageParams)
 }
-
-func playground(router fiber.Router) {
-	router.Get("/playground", playgroundHandler)
-}
