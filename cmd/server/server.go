@@ -51,8 +51,10 @@ func (s *Server) Start() {
 	fmt.Println("setting up routes...")
 	s.setupRoutes()
 
-	fmt.Println("seeding db...")
-	models.Seed()
+	if conf.Env == "development" {
+		fmt.Println("seeding db...")
+		models.Seed()
+	}
 
 	log.Fatal(s.app.Listen(s.addr))
 }
