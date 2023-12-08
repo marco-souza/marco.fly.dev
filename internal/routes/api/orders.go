@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/models"
@@ -19,8 +20,10 @@ func ordersHandler(c *fiber.Ctx) error {
 }
 
 type CreateOrderInput struct {
-	Name string `json: "name"`
+	Name string `json:"name" validate:"required,gte=0,lte=130"`
 }
+
+var validate = validator.New(validator.WithRequiredStructEnabled())
 
 func createOrderHandler(c *fiber.Ctx) error {
 	input := CreateOrderInput{}
@@ -29,7 +32,13 @@ func createOrderHandler(c *fiber.Ctx) error {
 		return c.SendStatus(400)
 	}
 
-	fmt.Println("input: {?:}", input)
+	err := validate.Struct(input)
+	if err != nil {
+		fmt.Println("validation error = ", err)
+		return c.SendStatus(400)
+	}
+
+	fmt.Println("input test: {?:}", input)
 
 	db := models.Connect()
 
