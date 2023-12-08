@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 
 	"github.com/marco-souza/marco.fly.dev/internal/models"
 )
@@ -60,14 +61,27 @@ func createOrderHandler(c *fiber.Ctx) error {
 	}
 	db.Create(&order)
 
+	return RenderOrderList(db, c)
+}
+
+func deleteOrderHandler(c *fiber.Ctx) error {
+	orderId := c.Params("id", "")
+	if orderId == "" {
+		fmt.Println("no order id found")
+		return c.SendStatus(400)
+	}
+
+	db := models.Connect()
+	db.Delete(&models.Order{}, orderId)
+
+	return RenderOrderList(db, c)
+}
+
+func RenderOrderList(db *gorm.DB, c *fiber.Ctx) error {
 	orders := []models.Order{}
 	result := db.Preload("Author").Find(&orders)
 	props := fiber.Map{"Orders": orders, "Total": result.RowsAffected}
 
 	return c.Render("partials/order-list", props, "layouts/empty")
-}
 
-func orders(router fiber.Router) {
-	router.Get("/orders", ordersHandler)
-	router.Post("/orders", createOrderHandler)
 }
