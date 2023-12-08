@@ -3,9 +3,7 @@
 <div class="gap-4 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-4 mt-8">
   {{range .Orders}}
   <a href="#">
-    <div
-      class="card bg-base-100 shadow-xl image-full h-48 hover:animate-bounce"
-    >
+    <div class="card bg-base-100 shadow-xl image-full h-48 hover:animate-pulse">
       <figure>
         <img src="{{ .CoverUrl }}" alt="{{ .Name }}" width="100%" />
       </figure>
@@ -15,7 +13,14 @@
           Order created by @{{ .Author.Username }}
         </p>
         <div class="card-actions justify-end">
-          <button class="btn btn-outline btn-secondary">Add Items</button>
+          <button
+            class="btn btn-outline btn-secondary"
+            hx-trigger="click"
+            hx-target="#content"
+            hx-delete="/api/orders/{{ .ID }}"
+          >
+            🗑️
+          </button>
         </div>
       </div>
     </div>
