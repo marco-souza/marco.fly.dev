@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -11,17 +13,25 @@ type Config struct {
 	Port        string
 	Env         string // development | production
 	DatabaseUrl string
+	RateLimit   int
 }
 
 func Load() *Config {
 	// load .env file
 	godotenv.Load()
 
+	rateLimitStr := env("RATE_LIMIT", "15")
+	rateLimit, err := strconv.ParseUint(rateLimitStr, 10, 32)
+	if err != nil {
+		fmt.Println("cannot parse rate limit {}")
+	}
+
 	return &Config{
 		Hostname:    env("HOST", "localhost"),
 		Port:        env("PORT", "3001"),
 		Env:         env("ENV", "development"),
 		DatabaseUrl: env("DB_URL", "./test.db"),
+		RateLimit:   int(rateLimit),
 	}
 }
 
