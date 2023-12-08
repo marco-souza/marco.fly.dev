@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -49,15 +50,16 @@ func createOrderHandler(c *fiber.Ctx) error {
 	}
 	db.Find(&user)
 
+	// generate random img based on order text
+	coverUrl := fmt.Sprintf(
+		"https://source.unsplash.com/random/256x128?%s&%d",
+		strings.ReplaceAll(input.Name, " ", ","),
+		rand.Intn(100),
+	)
 	order := models.Order{
-		Name: input.Name,
-		CoverUrl: fmt.Sprintf(
-			"https://source.unsplash.com/random/?%s&%d&w=%d",
-			input.Name,
-			rand.Intn(100),
-			250,
-		),
-		Author: user,
+		Name:     input.Name,
+		CoverUrl: coverUrl,
+		Author:   user,
 	}
 	db.Create(&order)
 
