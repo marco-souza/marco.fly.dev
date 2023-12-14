@@ -30,6 +30,12 @@ type GithubCredential struct {
 	ClientSecret string `json:"client_secret"`
 }
 
+type RefreshAuthParam struct {
+	*GithubCredential
+	GrantType    string `json:"grant_type"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 type FetchAuthParam struct {
 	*GithubCredential
 	Code string `json:"code"`
@@ -45,12 +51,48 @@ type AuthToken struct {
 }
 
 func (a *Auth) FetchAuthToken(code string) (*AuthToken, error) {
-	params := FetchAuthParam{
-		Code:             code,
-		GithubCredential: &githuCredentials,
-	}
+	return fetchAuthToken(
+		FetchAuthParam{
+			Code:             code,
+			GithubCredential: &githuCredentials,
+		},
+	)
+}
+
+func (a *Auth) RefreshAuthToken(refreshToken string) (*AuthToken, error) {
+	return fetchAuthToken(
+		RefreshAuthParam{
+			GrantType:        "refresh_token",
+			RefreshToken:     refreshToken,
+			GithubCredential: &githuCredentials,
+		},
+	)
+}
+
+func (a *Auth) RedirectLink(origin string) string {
+	redirectUrl, err := url.Parse(authUrl + "/authorize")
+	if err != nil {
+		log.Fatalf("Failed to parse url: %s", authUrl)
 	}
 
+	query := url.Values{}
+	state := fmt.Sprintf("%d", rand.Intn(1000000000))
+	redirectUri := origin + cfg.Github.CallbackUrl
+
+	query.Add("response_type", "code")
+	query.Add("state", state)
+	query.Add("scope", cfg.Github.Scope)
+	query.Add("client_id", cfg.Github.ClientId)
+	query.Add("client_secret", cfg.Github.ClientSecret)
+	query.Add("redirect_uri", redirectUri)
+
+	redirectUrl.RawQuery = query.Encode()
+
+	log.Printf("Failed to parse url: %s", redirectUrl.String())
+	return redirectUrl.String()
+}
+
+func fetchAuthToken(params interface{}) (*AuthToken, error) {
 	// parse params
 	body, err := json.Marshal(params)
 	if err != nil {
@@ -85,27 +127,4 @@ func (a *Auth) FetchAuthToken(code string) (*AuthToken, error) {
 	log.Print("access token is here: ", accessToken)
 
 	return &accessToken, nil
-}
-
-func (a *Auth) RedirectLink(origin string) string {
-	redirectUrl, err := url.Parse(authUrl + "/authorize")
-	if err != nil {
-		log.Fatalf("Failed to parse url: %s", authUrl)
-	}
-
-	query := url.Values{}
-	state := fmt.Sprintf("%d", rand.Intn(1000000000))
-	redirectUri := origin + cfg.Github.CallbackUrl
-
-	query.Add("response_type", "code")
-	query.Add("state", state)
-	query.Add("scope", cfg.Github.Scope)
-	query.Add("client_id", cfg.Github.ClientId)
-	query.Add("client_secret", cfg.Github.ClientSecret)
-	query.Add("redirect_uri", redirectUri)
-
-	redirectUrl.RawQuery = query.Encode()
-
-	log.Printf("Failed to parse url: %s", redirectUrl.String())
-	return redirectUrl.String()
 }
