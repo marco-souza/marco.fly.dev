@@ -13,19 +13,26 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 )
 
-const (
-	authUrl     = BASE_API_URL + "/oauth"
-	contentType = "application/json"
+var (
+	authUrl          = BASE_API_URL + "/oauth"
+	contentType      = "application/json"
+	cfg              = config.Load()
+	githuCredentials = GithubCredential{
+		ClientId:     cfg.Github.ClientId,
+		ClientSecret: cfg.Github.ClientSecret,
+	}
 )
-
-var cfg = config.Load()
 
 type Auth struct{}
 
-type FetchAuthParam struct {
-	Code         string `json:"code"`
+type GithubCredential struct {
 	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
+}
+
+type FetchAuthParam struct {
+	*GithubCredential
+	Code string `json:"code"`
 }
 
 type AuthToken struct {
@@ -39,9 +46,9 @@ type AuthToken struct {
 
 func (a *Auth) FetchAuthToken(code string) (*AuthToken, error) {
 	params := FetchAuthParam{
-		Code:         code,
-		ClientId:     cfg.Github.ClientId,
-		ClientSecret: cfg.Github.ClientSecret,
+		Code:             code,
+		GithubCredential: &githuCredentials,
+	}
 	}
 
 	// parse params
