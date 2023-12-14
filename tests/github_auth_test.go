@@ -10,6 +10,19 @@ import (
 func TestReturnedUrl(t *testing.T) {
 	auth := github.Auth{}
 
+	t.Run("refresh auth token", func(t *testing.T) {
+		refreshToken := "origin-url"
+		accessToken, err := auth.RefreshAuthToken(refreshToken)
+
+		if accessToken.RefreshToken == refreshToken {
+			t.Fatal("same refresh token", accessToken)
+		}
+
+		if err != nil {
+			t.Fatal("error generating access token", accessToken)
+		}
+	})
+
 	t.Run("fetch auth token", func(t *testing.T) {
 		code := "origin-url"
 		accessToken, err := auth.FetchAuthToken(code)

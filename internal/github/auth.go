@@ -72,7 +72,7 @@ func (a *Auth) RefreshAuthToken(refreshToken string) (*AuthToken, error) {
 func (a *Auth) RedirectLink(origin string) string {
 	redirectUrl, err := url.Parse(authUrl + "/authorize")
 	if err != nil {
-		log.Fatalf("Failed to parse url: %s", authUrl)
+		log.Fatalf("failed to parse url: %s", authUrl)
 	}
 
 	query := url.Values{}
@@ -88,7 +88,8 @@ func (a *Auth) RedirectLink(origin string) string {
 
 	redirectUrl.RawQuery = query.Encode()
 
-	log.Printf("Failed to parse url: %s", redirectUrl.String())
+	log.Printf("parsed url: %s", redirectUrl.String())
+
 	return redirectUrl.String()
 }
 
@@ -112,7 +113,7 @@ func fetchAuthToken(params interface{}) (*AuthToken, error) {
 	accessTokenRaw, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
-		log.Fatalf("Failed to parse body: %v", err)
+		log.Fatalf("failed to parse body: %v", err)
 		return nil, err
 	}
 
@@ -120,7 +121,7 @@ func fetchAuthToken(params interface{}) (*AuthToken, error) {
 	var accessToken AuthToken
 	err = json.Unmarshal(accessTokenRaw, &accessToken)
 	if err != nil {
-		log.Fatalf("Failed to unmarshal body: %v", err)
+		log.Fatalf("failed to unmarshal body: %v", err)
 		return nil, err
 	}
 
