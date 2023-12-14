@@ -8,7 +8,11 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[{Makefile,*.go}]
+[Makefile]
+indent_style = tab
+tab_width = 4
+
+[*.go]
 indent_style = tab
 tab_width = 4
 

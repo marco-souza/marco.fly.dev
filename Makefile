@@ -14,7 +14,8 @@ build: cmd/main.go
 fmt:
 	go fmt ./... && bunx prettier -w views ./README.md ./docker-compose.yml
 
-t: ./tests/
+t: test
+test: ./tests/
 	go test -v ./tests/
 
 encrypt: .env
