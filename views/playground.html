@@ -1,17 +1,17 @@
 <div class="text-center grid gap-4">
-  <h1 class="text-2xl">{{.Title}}</h1>
+    <h1 class="text-2xl">{{.Title}}</h1>
 
-  <button
-    hx-trigger="click, every 1s"
-    hx-get="/api/now"
-    hx-swap="innerHTML"
-    hx-target="#time"
-    hx-indicator="#indicator"
-    class="btn btn-secondary"
-  >
-    What time is it?
-  </button>
+    <button
+        hx-trigger="click, every 1s"
+        hx-get="/api/now"
+        hx-swap="innerHTML"
+        hx-target="#time"
+        hx-indicator="#indicator"
+        class="btn btn-secondary"
+    >
+        What time is it?
+    </button>
 
-  <div id="indicator" class="htmx-indicator loading loading-spinner"></div>
-  <div id="time">loading timer...</div>
+    <div id="indicator" class="htmx-indicator loading loading-spinner"></div>
+    <div id="time">loading timer...</div>
 </div>

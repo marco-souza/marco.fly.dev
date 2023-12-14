@@ -1,33 +1,33 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <title>{{.Title}}</title>
+    <head>
+        <title>{{.Title}}</title>
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="shortcut icon" href="/static/favicon.ico" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="/static/favicon.ico" />
 
-    <!-- tailwind + daisyui -->
-    <link href="/static/daisyui.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/src/index.min.js"></script>
+        <!-- tailwind + daisyui -->
+        <link href="/static/daisyui.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/src/index.min.js"></script>
 
-    <!-- htmx -->
-    <script src="/static/htmx.js"></script>
+        <!-- htmx -->
+        <script src="/static/htmx.js"></script>
 
-    <!-- hyperscript -->
-    <script src="/static/hyperscript.js"></script>
-  </head>
+        <!-- hyperscript -->
+        <script src="/static/hyperscript.js"></script>
+    </head>
 
-  <body
-    id="app"
-    class="container mx-auto"
-    _='{{template "partials/hot-reload" .}}'
-  >
-    {{template "partials/header" .}}
+    <body
+        id="app"
+        class="container mx-auto"
+        _='{{template "partials/hot-reload" .}}'
+    >
+        {{template "partials/header" .}}
 
-    <main class="mx-auto p-8 max-w-2xl min-h-[70vh]">{{embed}}</main>
+        <main class="mx-auto p-8 max-w-2xl min-h-[70vh]">{{embed}}</main>
 
-    {{template "partials/footer" .}}
-  </body>
+        {{template "partials/footer" .}}
+    </body>
 </html>
