@@ -14,6 +14,7 @@ type Config struct {
 	Env         string // development | production
 	DatabaseUrl string
 	RateLimit   int
+	Github      Github
 }
 
 func Load() *Config {
@@ -32,6 +33,7 @@ func Load() *Config {
 		Env:         env("ENV", "development"),
 		DatabaseUrl: env("DB_URL", "./test.db"),
 		RateLimit:   int(rateLimit),
+		Github:      GithubLoad(),
 	}
 }
 
