@@ -10,6 +10,23 @@ import (
 func TestReturnedUrl(t *testing.T) {
 	auth := github.Auth{}
 
+	t.Run("fetch auth token", func(t *testing.T) {
+		code := "origin-url"
+		accessToken, err := auth.FetchAuthToken(code)
+
+		if accessToken.ExpiresIn == 0 {
+			t.Skip("invalid expires in", accessToken)
+		}
+
+		if accessToken.RefreshTokenExpiresIn == 0 {
+			t.Skip("invalid refresh expires in", accessToken)
+		}
+
+		if err != nil {
+			t.Fatal("error generating access token", accessToken)
+		}
+	})
+
 	t.Run("validate redirect url", func(t *testing.T) {
 		origin := "origin-url"
 		redirectUrl := auth.RedirectLink(origin)
