@@ -17,7 +17,7 @@ type GitHubUser struct {
 
 func User(username string) GitHubUser {
 	// set up the GitHub API endpoint
-	url := fmt.Sprintf("https://api.github.com/users/%s", username)
+	url := fmt.Sprintf("%s/users/%s", BASE_API_URL, username)
 
 	log.Println("Loading profile", url)
 
