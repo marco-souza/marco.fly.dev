@@ -17,11 +17,11 @@ COPY . .
 # dev stage
 FROM pre-build as dev
 RUN go install github.com/cosmtrek/air@latest
-CMD ["make", "run"]
+CMD ["make", "release"]
 
 # build stage
 FROM pre-build as build
-RUN make build
+RUN make release
 
 # prod stage
 FROM base as prod

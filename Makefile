@@ -8,8 +8,8 @@ run: deps cmd/main.go
 deploy: ./fly.toml
 	pkgx fly deploy --now -y
 
-build: cmd/main.go
-	CGO_ENABLED=1 go build -o ./build/server ./cmd/main.go
+release: cmd/main.go
+	CGO_CFLAGS="-D_LARGEFILE64_SOURCE" CGO_ENABLED=1 go build -ldflags "-s -w" -o ./build/server ./cmd/main.go
 
 fmt:
 	go fmt ./... && bunx prettier -w views ./README.md ./docker-compose.yml
