@@ -1,7 +1,9 @@
 package github
 
 import (
+	"log"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,20 +19,25 @@ func (c *AuthCookies) SetAuthCookies(auth *AuthToken) {
 	c.setCookie(c.RefreshTokenKey, auth.RefreshToken, auth.RefreshTokenExpiresIn)
 }
 
-func (c *AuthCookies) setCookie(name, token string, expiry int) {
-	cookie := fiber.Cookie{
-		HTTPOnly: true,
-		Path:     "/",
-		Name:     name,
-		Value:    token,
-		MaxAge:   expiry,
-		Domain:   c.Hostname(),
-		Secure:   strings.HasPrefix(c.Protocol(), "https"),
-	}
-
-	c.Cookie(&cookie)
+func (c *AuthCookies) DeleteAuthCookies() {
+	c.setCookie(c.AccessTokenKey, "", -1)
+	c.setCookie(c.RefreshTokenKey, "", -1)
 }
 
-func (c *AuthCookies) DeleteAuthCookies() {
-	c.ClearCookie(c.RefreshTokenKey, c.AccessTokenKey)
+func (c *AuthCookies) setCookie(name, token string, expires int) {
+	cookie := &fiber.Cookie{
+		Name:        name,
+		Value:       token,
+		Path:        "/",
+		HTTPOnly:    true,
+		SameSite:    "Lax",
+		SessionOnly: false,
+		Expires:     time.Now().Add(time.Second * time.Duration(expires)),
+		Domain:      strings.Join(c.GetReqHeaders()["host"], ""),
+		Secure:      strings.HasPrefix(c.Protocol(), "https"),
+	}
+
+	log.Print("set cookie: ", name, cookie)
+
+	c.Cookie(cookie)
 }

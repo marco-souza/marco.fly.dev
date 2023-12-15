@@ -41,13 +41,13 @@ func callbackGithubAuth(c *fiber.Ctx) error {
 }
 
 func logoutGithubAuth(c *fiber.Ctx) error {
-	log.Print("logging out")
-
 	cookies := github.AuthCookies{
 		Ctx:             c,
 		AccessTokenKey:  accessTokenKey,
 		RefreshTokenKey: refreshTokenKey,
 	}
+
+	log.Print("logging out")
 	cookies.DeleteAuthCookies()
 
 	return c.Redirect("/", 302)
