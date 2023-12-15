@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	authUrl          = BASE_API_URL + "/oauth"
+	authUrl          = "https://github.com/login/oauth"
 	contentType      = "application/json"
 	cfg              = config.Load()
 	githuCredentials = GithubCredential{
@@ -83,7 +83,6 @@ func (a *Auth) RedirectLink(origin string) string {
 	query.Add("state", state)
 	query.Add("scope", cfg.Github.Scope)
 	query.Add("client_id", cfg.Github.ClientId)
-	query.Add("client_secret", cfg.Github.ClientSecret)
 	query.Add("redirect_uri", redirectUri)
 
 	redirectUrl.RawQuery = query.Encode()
@@ -94,22 +93,33 @@ func (a *Auth) RedirectLink(origin string) string {
 }
 
 func fetchAuthToken(params interface{}) (*AuthToken, error) {
-	// parse params
+	log.Print("parse params", params)
 	body, err := json.Marshal(params)
 	if err != nil {
 		log.Fatal("failed to parse params", params, err)
 		return nil, err
 	}
 
-	// fetch auth token with code + credentials
+	log.Print("fetch auth token with code + credentials")
+
+	client := &http.Client{}
 	accessTokenUrl := authUrl + "/access_token"
-	res, err := http.Post(accessTokenUrl, contentType, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", accessTokenUrl, bytes.NewBuffer(body))
 	if err != nil {
 		log.Fatal("failed to fetch access token", err)
 		return nil, err
 	}
 
-	// read body buffer
+	req.Header.Set("Accept", contentType)
+	req.Header.Set("Content-Type", contentType)
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal("failed to fetch access token", err)
+		return nil, err
+	}
+
+	log.Print("read body buffer")
 	accessTokenRaw, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
@@ -117,7 +127,7 @@ func fetchAuthToken(params interface{}) (*AuthToken, error) {
 		return nil, err
 	}
 
-	// Parse the JSON response
+	log.Print("parse json response ", string(accessTokenRaw))
 	var accessToken AuthToken
 	err = json.Unmarshal(accessTokenRaw, &accessToken)
 	if err != nil {

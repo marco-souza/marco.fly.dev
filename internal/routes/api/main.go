@@ -22,5 +22,9 @@ func Apply(router fiber.Router) {
 		Post("/", createOrderHandler).
 		Delete("/:id", deleteOrderHandler)
 
+	router.Group("/auth/github").
+		Get("/", redirectGithubAuth).
+		Get("/callback", callbackGithubAuth)
+
 	router.Get("/now", nowHandler)
 }
