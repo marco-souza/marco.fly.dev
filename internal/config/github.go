@@ -7,6 +7,7 @@ type Github struct {
 	RefreshUrl   string
 	LogoutUrl    string
 	SignInUrl    string
+	DashboardUrl string
 	Scope        string
 }
 
@@ -14,9 +15,10 @@ func GithubLoad() Github {
 	conf := Github{
 		ClientId:     env("GITHUB_CLIENT_ID", ""),
 		ClientSecret: env("GITHUB_CLIENT_SECRET", ""),
+		DashboardUrl: "/#/",
 		CallbackUrl:  "/api/auth/github/callback",
 		RefreshUrl:   "/api/auth/github/refresh",
-		LogoutUrl:    "/api/auth/logout",
+		LogoutUrl:    "/api/auth/github/logout",
 		SignInUrl:    "/api/auth/github",
 		Scope:        "read:user",
 	}
