@@ -1,0 +1,27 @@
+<div
+    class="flex gap-10 my-8 flex-col items-center text-center xl:my-16 2xl:my-32"
+>
+    <section class="bg-gray-50 dark:bg-gray-900">
+        <div
+            class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700"
+        >
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1
+                    class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
+                >
+                    Welcome to my lab 👋
+                </h1>
+
+                <form class="space-y-4 md:space-y-6" action="{{ .SignInUrl }}">
+                    <button
+                        type="submit"
+                        class="btn btn-outline btn-secondary w-full"
+                    >
+                        {{template "partials/github-icon" .}} Sign in with
+                        Github
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>

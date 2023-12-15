@@ -8,5 +8,6 @@ func Apply(router fiber.Router) {
 	router.Get("/", rootHandler).
 		Get("/playground", playgroundHandler).
 		Get("/orders", ordersHandler).
+		Get("/login", loginHandler).
 		Use(notFoundHandler)
 }
