@@ -25,6 +25,7 @@ func Apply(router fiber.Router) {
 	router.Group("/auth/github").
 		Get("/", redirectGithubAuth).
 		Get("/callback", callbackGithubAuth).
+		Get("/refresh", logoutGithubAuth).
 		Get("/logout", logoutGithubAuth)
 
 	router.Get("/now", nowHandler)

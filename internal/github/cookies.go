@@ -13,6 +13,10 @@ type AuthCookies struct {
 	RefreshTokenKey string
 	AccessTokenKey  string
 }
+type PersistedAuthTokens struct {
+	RefreshToken string `cookie:"refresh_token"`
+	AccessToken  string `cookie:"access_token"`
+}
 
 func (c *AuthCookies) SetAuthCookies(auth *AuthToken) {
 	c.setCookie(c.AccessTokenKey, auth.AccessToken, auth.ExpiresIn)
@@ -24,8 +28,8 @@ func (c *AuthCookies) DeleteAuthCookies() {
 	c.setCookie(c.RefreshTokenKey, "", -1)
 }
 
-func (c *AuthCookies) GetAuthToken(name string) (*AuthToken, error) {
-	auth := &AuthToken{}
+func (c *AuthCookies) GetAuthToken(name string) (*PersistedAuthTokens, error) {
+	auth := &PersistedAuthTokens{}
 	if err := c.CookieParser(auth); err != nil {
 		return nil, err
 	}
