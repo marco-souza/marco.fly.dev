@@ -24,6 +24,14 @@ func (c *AuthCookies) DeleteAuthCookies() {
 	c.setCookie(c.RefreshTokenKey, "", -1)
 }
 
+func (c *AuthCookies) GetAuthToken(name string) (*AuthToken, error) {
+	auth := &AuthToken{}
+	if err := c.CookieParser(auth); err != nil {
+		return nil, err
+	}
+	return auth, nil
+}
+
 func (c *AuthCookies) setCookie(name, token string, expires int) {
 	cookie := &fiber.Cookie{
 		Name:        name,
