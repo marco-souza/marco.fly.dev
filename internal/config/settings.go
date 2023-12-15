@@ -21,7 +21,8 @@ var DefaultPageParams = PageParams{
 	[]MenuItem{
 		{"/", "Home"},
 		{"https://marco.deno.dev/blog", "Blog"},
-		{"/playground", "Playground"},
-		{"/orders", "Ordero"},
+		// {"/playground", "Playground"},
+		// {"/orders", "Ordero"},
+		{"/login", "Login"},
 	},
 }

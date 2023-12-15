@@ -15,7 +15,7 @@ func GithubLoad() Github {
 	conf := Github{
 		ClientId:     env("GITHUB_CLIENT_ID", ""),
 		ClientSecret: env("GITHUB_CLIENT_SECRET", ""),
-		DashboardUrl: "/#/",
+		DashboardUrl: "/app/",
 		CallbackUrl:  "/api/auth/github/callback",
 		RefreshUrl:   "/api/auth/github/refresh",
 		LogoutUrl:    "/api/auth/github/logout",
