@@ -20,7 +20,7 @@ var DefaultPageParams = PageParams{
 	"https://github.com/marco-souza/marco.fly.io",
 	[]MenuItem{
 		{"/", "Home"},
-		{"https://marco.deno.dev/blog", "Blog"},
+		// {"https://marco.deno.dev/blog", "Blog"},
 		{"/playground", "Playground"},
 		{"/orders", "Ordero"},
 		{"/login", "Login"},
