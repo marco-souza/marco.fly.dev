@@ -11,6 +11,7 @@ import (
 func MustBeLoged(c *fiber.Ctx) error {
 	hasAccessToken := c.Cookies("access_token", "") != ""
 	log.Println("Is user logged: ", hasAccessToken)
+
 	if !hasAccessToken {
 		return c.Redirect(
 			config.Load().Github.LoginPage,

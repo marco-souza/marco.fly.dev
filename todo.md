@@ -2,7 +2,7 @@
 
 ## In-Progress // upcoming
 
-    - [ ] add midleware for private routes
+    - [x] add midleware for private routes
     - [ ] hide login button if logged
     - [ ] handle errors for form validation
     - [ ] add cache for pages
