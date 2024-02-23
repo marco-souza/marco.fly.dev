@@ -1,18 +1,7 @@
 <div
     class="flex gap-10 my-8 flex-col items-center text-center xl:my-16 2xl:my-32"
 >
-    <div class="flex gap-2 flex-col">
-        <img
-            alt="It's Me"
-            src="{{.Profile.Avatar}}"
-            class="h-40 mx-auto rounded-full"
-        />
-        <div class="text-3xl font-light">{{.Profile.Name}}</div>
-    </div>
-
-    <div class="text-md opacity-70 px-10 font-extralight sm:px-20 md:px-32">
-        {{.Description}}
-    </div>
+    {{template "partials/profile" .}}
 
     <div class="gap-8 grid w-full grid-cols-1 sm:mx-20 sm:grid-cols-2">
         <a
