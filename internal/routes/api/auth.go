@@ -7,14 +7,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/constants"
 	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
 var (
-	auth            = github.Auth{}
-	cfg             = config.Load()
-	refreshTokenKey = "refresh_token"
-	accessTokenKey  = "access_token"
+	auth = github.Auth{}
+	cfg  = config.Load()
 )
 
 func redirectGithubAuth(c *fiber.Ctx) error {
@@ -28,8 +27,8 @@ func callbackGithubAuth(c *fiber.Ctx) error {
 	queries := c.Queries()
 	cookies := github.AuthCookies{
 		Ctx:             c,
-		AccessTokenKey:  accessTokenKey,
-		RefreshTokenKey: refreshTokenKey,
+		AccessTokenKey:  constants.ACCESS_TOKEN_KEY,
+		RefreshTokenKey: constants.REFRESH_TOKEN_KEY,
 	}
 
 	code := queries["code"]
