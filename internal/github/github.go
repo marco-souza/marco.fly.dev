@@ -15,14 +15,28 @@ type GitHubUser struct {
 	Avatar string `json:"avatar_url"`
 }
 
-func User(username string) GitHubUser {
+func User(username, token string) GitHubUser {
 	// set up the GitHub API endpoint
 	url := fmt.Sprintf("%s/users/%s", BASE_API_URL, username)
+	if len(username) == 0 {
+		log.Println("Loading logged user profile", username, token)
+		url = fmt.Sprintf("%s/user", BASE_API_URL)
+	}
 
 	log.Println("Loading profile", url)
 
 	// make a GET request to the URL
-	resp, err := http.Get(url)
+	client := http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(token) > 0 {
+		req.Header.Add("Authorization", "Bearer "+token)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -23,7 +23,7 @@ type rootProps struct {
 }
 
 func rootHandler(c *fiber.Ctx) error {
-	user := github.User("marco-souza")
+	user := github.User("marco-souza", "")
 	props := rootProps{
 		PageParams:   config.DefaultPageParams,
 		PrimaryBtn:   contactURL(),
