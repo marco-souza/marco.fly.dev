@@ -26,10 +26,6 @@ func dashboardHandler(c *fiber.Ctx) error {
 	}
 
 	token := c.Cookies("access_token", "")
-	if token == "" {
-		return c.Redirect("/", 302)
-	}
-
 	loggedUser := github.User("", token)
 	props := dashboardProps{
 		config.DefaultPageParams,
