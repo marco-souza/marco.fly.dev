@@ -26,12 +26,15 @@ func dashboardHandler(c *fiber.Ctx) error {
 	}
 
 	token := c.Cookies("access_token", "")
-	user := github.User("", token)
+	if token == "" {
+		return c.Redirect("/", 302)
+	}
 
+	loggedUser := github.User("", token)
 	props := dashboardProps{
 		config.DefaultPageParams,
-		user,
-		user.Bio,
+		loggedUser,
+		loggedUser.Bio,
 		cfg.Github.LogoutUrl,
 		breadcrumbs,
 	}
