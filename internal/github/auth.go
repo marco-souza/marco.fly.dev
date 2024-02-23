@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/constants"
 )
 
 var (
@@ -138,4 +140,20 @@ func fetchAuthToken(params interface{}) (*AuthToken, error) {
 	log.Print("access token is here: ", accessToken)
 
 	return &accessToken, nil
+}
+
+func AccessToken(c *fiber.Ctx) string {
+	return c.Cookies(constants.ACCESS_TOKEN_KEY, "")
+}
+
+func RefreshToken(c *fiber.Ctx) string {
+	return c.Cookies(constants.REFRESH_TOKEN_KEY, "")
+}
+
+func HasAccessToken(c *fiber.Ctx) bool {
+	return AccessToken(c) != ""
+}
+
+func HasRefreshToken(c *fiber.Ctx) bool {
+	return RefreshToken(c) != ""
 }

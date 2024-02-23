@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/constants"
 	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
@@ -25,7 +26,7 @@ func dashboardHandler(c *fiber.Ctx) error {
 		{"/app", "Dashboard", "🏂"},
 	}
 
-	token := c.Cookies("access_token", "")
+	token := github.AccessToken(c)
 	loggedUser := github.User("", token)
 	props := dashboardProps{
 		config.DefaultPageParams,

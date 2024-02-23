@@ -6,6 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/constants"
+	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
 var cfg = config.Load()
@@ -16,8 +18,11 @@ type loginProps struct {
 }
 
 func loginHandler(c *fiber.Ctx) error {
-	if c.Cookies("access_token", "") == "" {
-		return c.Redirect(cfg.Github.DashboardPage, http.StatusTemporaryRedirect)
+	if github.HasAccessToken(c) {
+		return c.Redirect(
+			cfg.Github.DashboardPage,
+			http.StatusTemporaryRedirect,
+		)
 	}
 	return c.Render("login", loginProps{
 		PageParams: config.DefaultPageParams,
