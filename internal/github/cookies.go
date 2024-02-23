@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/marco-souza/marco.fly.dev/internal/constants"
 )
 
 type AuthCookies struct {
@@ -52,4 +53,20 @@ func (c *AuthCookies) setCookie(name, token string, expires int) {
 	log.Print("set cookie: ", name, cookie)
 
 	c.Cookie(cookie)
+}
+
+func AccessToken(c *fiber.Ctx) string {
+	return c.Cookies(constants.ACCESS_TOKEN_KEY, "")
+}
+
+func RefreshToken(c *fiber.Ctx) string {
+	return c.Cookies(constants.REFRESH_TOKEN_KEY, "")
+}
+
+func HasAccessToken(c *fiber.Ctx) bool {
+	return AccessToken(c) != ""
+}
+
+func HasRefreshToken(c *fiber.Ctx) bool {
+	return RefreshToken(c) != ""
 }
