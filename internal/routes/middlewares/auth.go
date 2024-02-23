@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/marco-souza/marco.fly.dev/internal/config"
@@ -16,7 +15,7 @@ func MustBeLoged(c *fiber.Ctx) error {
 	if !hasAccessToken {
 		return c.Redirect(
 			config.Load().Github.LoginPage,
-			http.StatusTemporaryRedirect,
+			fiber.StatusTemporaryRedirect,
 		)
 	}
 

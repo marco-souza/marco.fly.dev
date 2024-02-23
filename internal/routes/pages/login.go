@@ -1,12 +1,9 @@
 package pages
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
-	"github.com/marco-souza/marco.fly.dev/internal/constants"
 	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
@@ -21,7 +18,7 @@ func loginHandler(c *fiber.Ctx) error {
 	if github.HasAccessToken(c) {
 		return c.Redirect(
 			cfg.Github.DashboardPage,
-			http.StatusTemporaryRedirect,
+			fiber.StatusTemporaryRedirect,
 		)
 	}
 	return c.Render("login", loginProps{
