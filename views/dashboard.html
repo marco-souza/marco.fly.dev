@@ -1,5 +1,9 @@
 <div class="text-center grid gap-4">
-    {{template "partials/breadcrumbs" .}}
+    {{template "partials/breadcrumbs" .}} {{template "partials/profile" .}}
 
-    <h1 class="text-2xl">{{.Title}}</h1>
+    <form class="space-y-4 md:space-y-6" action="{{ .Logout }}">
+        <button type="submit" class="btn btn-outline btn-neutral w-full">
+            {{template "partials/github-icon" .}} Logout
+        </button>
+    </form>
 </div>
