@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -20,7 +21,7 @@ func redirectGithubAuth(c *fiber.Ctx) error {
 	origin := c.BaseURL()
 	redirectUrl := auth.RedirectLink(origin)
 
-	return c.Redirect(redirectUrl, 302)
+	return c.Redirect(redirectUrl, http.StatusTemporaryRedirect)
 }
 
 func callbackGithubAuth(c *fiber.Ctx) error {
@@ -37,7 +38,7 @@ func callbackGithubAuth(c *fiber.Ctx) error {
 	log.Print("settings auth cookies")
 	cookies.SetAuthCookies(authToken)
 
-	return c.Redirect(cfg.Github.DashboardPage, 302)
+	return c.Redirect(cfg.Github.DashboardPage, http.StatusTemporaryRedirect)
 }
 
 func logoutGithubAuth(c *fiber.Ctx) error {
@@ -50,5 +51,5 @@ func logoutGithubAuth(c *fiber.Ctx) error {
 	log.Print("logging out")
 	cookies.DeleteAuthCookies()
 
-	return c.Redirect("/", 302)
+	return c.Redirect("/", http.StatusTemporaryRedirect)
 }
