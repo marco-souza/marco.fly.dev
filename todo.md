@@ -5,7 +5,7 @@
     - [x] add midleware for private routes
     - [ ] hide login button if logged
     - [ ] handle errors for form validation
-    - [ ] add cache for pages
+    - [x] add cache for pages
 
 ## Backlog
 

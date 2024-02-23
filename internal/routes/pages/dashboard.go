@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
-	"github.com/marco-souza/marco.fly.dev/internal/constants"
 	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
