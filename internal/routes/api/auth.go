@@ -37,7 +37,7 @@ func callbackGithubAuth(c *fiber.Ctx) error {
 	log.Print("settings auth cookies")
 	cookies.SetAuthCookies(authToken)
 
-	return c.Redirect(cfg.Github.DashboardUrl, 302)
+	return c.Redirect(cfg.Github.DashboardPage, 302)
 }
 
 func logoutGithubAuth(c *fiber.Ctx) error {
