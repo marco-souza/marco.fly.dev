@@ -1,5 +1,5 @@
 # base stage
-FROM golang:1.21-alpine as base
+FROM golang:1.22-alpine as base
 WORKDIR /app
 COPY ./views/ ./views/
 COPY ./static/ ./static/
