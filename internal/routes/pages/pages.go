@@ -12,11 +12,11 @@ func Apply(router fiber.Router) {
 	// private routes
 	router.Group("/app").
 		Use(middlewares.MustBeLoged).
-		Get("/", dashboardHandler)
+		Get("/", dashboardHandler).
+		Get("/playground", playgroundHandler).
+		Get("/orders", ordersHandler)
 
 	router.Get("/", rootHandler).
-		Get("/playground", playgroundHandler).
-		Get("/orders", ordersHandler).
 		Get("/login", loginHandler).
 		Use(notFoundHandler)
 }

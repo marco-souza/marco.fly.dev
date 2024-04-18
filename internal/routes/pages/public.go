@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
@@ -24,8 +25,10 @@ type rootProps struct {
 
 func rootHandler(c *fiber.Ctx) error {
 	user := github.User("marco-souza", "")
+	token := github.AccessToken(c)
+	pageParams := config.MakePageParams(token != "")
 	props := rootProps{
-		PageParams:   config.DefaultPageParams,
+		PageParams:   pageParams,
 		PrimaryBtn:   contactURL(),
 		SecondaryBtn: "/resume",
 		Profile:      user,
@@ -76,4 +79,11 @@ func processBio(text string) template.HTML {
 	})
 
 	return template.HTML(result)
+}
+
+func notFoundHandler(c *fiber.Ctx) error {
+	log.Println("Page not found")
+	return c.
+		Status(http.StatusNotFound).
+		Render("404", config.DefaultPageParams)
 }

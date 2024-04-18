@@ -21,8 +21,26 @@ var DefaultPageParams = PageParams{
 	[]MenuItem{
 		{"/", "Home"},
 		// {"https://marco.deno.dev/blog", "Blog"},
-		{"/playground", "Playground"},
-		{"/orders", "Ordero"},
 		{"/login", "Login"},
 	},
+}
+
+var PrivatePageParams = PageParams{
+	conf.Env == "development",
+	"Marco.labs 🚀",
+	"https://github.com/marco-souza/marco.fly.io",
+	[]MenuItem{
+		{"/", "Home"},
+		{"/app/", "Dashboard"},
+		{"/app/playground", "Playground"},
+		{"/app/orders", "Ordero"},
+		{conf.Github.LogoutUrl, "Logout"},
+	},
+}
+
+func MakePageParams(authhenticated bool) PageParams {
+	if authhenticated {
+		return PrivatePageParams
+	}
+	return DefaultPageParams
 }
