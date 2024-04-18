@@ -29,4 +29,5 @@ func Apply(router fiber.Router) {
 		Get("/logout", logoutGithubAuth)
 
 	router.Get("/now", nowHandler)
+	router.Get("/sse", sseHandler)
 }
