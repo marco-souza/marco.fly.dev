@@ -20,10 +20,7 @@ type Server struct {
 	app      *fiber.App
 }
 
-var (
-	conf         = config.Load()
-	shouldUpdate = true
-)
+var conf = config.Load()
 
 func New() *Server {
 	hostname := conf.Hostname
@@ -60,11 +57,6 @@ func (s *Server) Start() {
 }
 
 func (s *Server) setupRoutes() {
-	if conf.Env == "development" {
-		log.Println("setup hot reload")
-		s.app.Get("/hot-reload", hotReloadHandler)
-	}
-
 	log.Println("setup static resources")
 	s.app.Static("/static", "./static", fiber.Static{
 		Compress:      true,
@@ -75,9 +67,4 @@ func (s *Server) setupRoutes() {
 	})
 
 	routes.SetupRoutes(s.app)
-}
-
-func hotReloadHandler(c *fiber.Ctx) error {
-	defer func() { shouldUpdate = false }()
-	return c.SendString(fmt.Sprintf("%t", shouldUpdate))
 }

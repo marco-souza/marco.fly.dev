@@ -18,13 +18,11 @@
 
         <!-- hyperscript -->
         <script src="/static/hyperscript.js"></script>
+
+        {{template "partials/hot-reload" .}}
     </head>
 
-    <body
-        id="app"
-        class="container mx-auto"
-        _='{{template "partials/hot-reload" .}}'
-    >
+    <body id="app" class="container mx-auto">
         {{template "partials/header" .}}
 
         <main class="mx-auto p-8 max-w-2xl min-h-[70vh]">{{embed}}</main>

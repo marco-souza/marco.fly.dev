@@ -6,7 +6,7 @@ type MenuItem struct {
 }
 
 type PageParams struct {
-	IsEnv     bool
+	IsDev     bool
 	Title     string
 	Repo      string
 	MenuItems []MenuItem
