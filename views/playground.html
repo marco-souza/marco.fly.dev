@@ -15,3 +15,8 @@
     <div id="indicator" class="htmx-indicator loading loading-spinner"></div>
     <div id="time">loading timer...</div>
 </div>
+
+<div hx-ext="sse" sse-connect="/api/sse" sse-swap="message">
+    Contents of this box will be updated in real time with every SSE message
+    received from the chatroom.
+</div>
