@@ -2,10 +2,8 @@
 
 ## In-Progress // upcoming
 
-    - [x] add midleware for private routes
-    - [ ] hide login button if logged
     - [ ] handle errors for form validation
-    - [x] add cache for pages
+    - [ ] make menu lazyloaded by htmx
 
 ## Backlog
 
@@ -16,6 +14,9 @@
 
 ## Done
 
+    - [x] add midleware for private routes
+    - [x] hide login button if logged
+    - [x] add cache for pages
     - [x] setup auth (goth, goth_fiber)
     - [x] setup page layouts with gofiber
     - [x] improve routing
