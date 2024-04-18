@@ -44,7 +44,7 @@ func TestReturnedUrl(t *testing.T) {
 		origin := "origin-url"
 		redirectUrl := auth.RedirectLink(origin)
 
-		if !strings.Contains(redirectUrl, "api.github") {
+		if !strings.Contains(redirectUrl, "github.com") {
 			t.Fatal("does not contain base api", redirectUrl)
 		}
 		if !strings.Contains(redirectUrl, origin) {
