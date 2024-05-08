@@ -45,20 +45,15 @@ func rootHandler(c *fiber.Ctx) error {
 	return c.Render("index", props)
 }
 
-type resumeProps struct {
-	config.PageParams
-	Profile     github.GitHubUser
-	Description template.HTML
-}
-
 func resumeHandler(c *fiber.Ctx) error {
 	log.Println("Building resume page")
 	user := github.User("marco-souza", "")
 	token := github.AccessToken(c)
 	pageParams := config.MakePageParams(token != "")
 
-	props := resumeProps{
+	props := rootProps{
 		PageParams:  pageParams,
+		PrimaryBtn:  contactURL(),
 		Profile:     user,
 		Description: processBio(user.Bio),
 	}
@@ -83,6 +78,7 @@ func contactURL() string {
 var linkMap = map[string]string{
 	"tremtec":  "https://tremtec.com",
 	"podcodar": "https://podcodar.com",
+	"mongodb":  "https://mongodb.com",
 }
 
 func processBio(text string) template.HTML {
