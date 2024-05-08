@@ -69,7 +69,7 @@ func sseReloadHandler(c *fiber.Ctx) error {
 				fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
 				break
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}))
 
