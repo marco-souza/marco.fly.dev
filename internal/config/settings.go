@@ -17,7 +17,7 @@ var conf = Load()
 var DefaultPageParams = PageParams{
 	conf.Env == "development",
 	"Marco.labs 🚀",
-	"https://github.com/marco-souza/marco.fly.io",
+	"https://github.com/marco-souza",
 	[]MenuItem{
 		{"/", "Home"},
 		{"/resume", "Resume"},

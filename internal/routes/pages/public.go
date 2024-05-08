@@ -47,9 +47,13 @@ func rootHandler(c *fiber.Ctx) error {
 
 func resumeHandler(c *fiber.Ctx) error {
 	log.Println("Building resume page")
+
 	user := github.User("marco-souza", "")
 	token := github.AccessToken(c)
 	pageParams := config.MakePageParams(token != "")
+
+	// set custom title
+	pageParams.Title = fmt.Sprintf("Resume - %s", pageParams.Title)
 
 	props := rootProps{
 		PageParams:  pageParams,
