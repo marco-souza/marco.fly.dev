@@ -1,32 +1,40 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <title>{{.Title}}</title>
 
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="shortcut icon" href="/static/favicon.ico" />
+<head>
+    <title>{{.Title}}</title>
 
-        <!-- tailwind + daisyui -->
-        <link href="/static/daisyui.css" rel="stylesheet" type="text/css" />
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/src/index.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/static/favicon.ico" />
 
-        <!-- htmx -->
-        <script src="/static/htmx.js"></script>
-        <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+    <!-- tailwind + daisyui -->
+    <link href="/static/daisyui.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/src/index.min.js"></script>
 
-        <!-- hyperscript -->
-        <script src="/static/hyperscript.js"></script>
+    <!-- htmx -->
+    <script src="/static/htmx.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
 
-        {{template "partials/hot-reload" .}}
-    </head>
+    <!-- hyperscript -->
+    <script src="/static/hyperscript.js"></script>
 
-    <body id="app" class="container mx-auto">
-        {{template "partials/header" .}}
+    <!-- markdown styles -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css"
+        integrity="sha512-h/laqMqQKUXxFuu6aLAaSrXYwGYQ7qk4aYCQ+KJwHZMzAGaEoxMM6h8C+haeJTU1V6E9jrSUnjpEzX23OmV/Aw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-        <main class="mx-auto p-8 max-w-2xl min-h-[70vh]">{{embed}}</main>
+    {{template "partials/hot-reload" .}}
+</head>
 
-        {{template "partials/footer" .}}
-    </body>
+<body id="app" class="container mx-auto">
+    {{template "partials/header" .}}
+
+    <main class="mx-auto p-8 max-w-6xl min-h-[70vh]">{{embed}}</main>
+
+    {{template "partials/footer" .}}
+</body>
+
 </html>
