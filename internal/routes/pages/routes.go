@@ -17,6 +17,7 @@ func Apply(router fiber.Router) {
 		Get("/orders", ordersHandler)
 
 	router.Get("/", rootHandler).
+		Get("/resume", resumeHandler).
 		Get("/login", loginHandler).
 		Use(notFoundHandler)
 }

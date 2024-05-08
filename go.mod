@@ -8,6 +8,7 @@ require (
 	github.com/gofiber/storage/sqlite3/v2 v2.1.0
 	github.com/gofiber/template/html/v2 v2.0.5
 	github.com/joho/godotenv v1.5.1
+	github.com/valyala/fasthttp v1.51.0
 	gorm.io/driver/sqlite v1.5.4
 	gorm.io/gorm v1.25.5
 )
@@ -32,7 +33,6 @@ require (
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/net v0.19.0 // indirect

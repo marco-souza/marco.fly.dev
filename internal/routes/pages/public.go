@@ -23,6 +23,13 @@ type rootProps struct {
 	Description  template.HTML
 }
 
+func notFoundHandler(c *fiber.Ctx) error {
+	log.Println("Page not found")
+	return c.
+		Status(http.StatusNotFound).
+		Render("404", config.DefaultPageParams)
+}
+
 func rootHandler(c *fiber.Ctx) error {
 	user := github.User("marco-souza", "")
 	token := github.AccessToken(c)
@@ -36,6 +43,27 @@ func rootHandler(c *fiber.Ctx) error {
 	}
 
 	return c.Render("index", props)
+}
+
+type resumeProps struct {
+	config.PageParams
+	Profile     github.GitHubUser
+	Description template.HTML
+}
+
+func resumeHandler(c *fiber.Ctx) error {
+	log.Println("Building resume page")
+	user := github.User("marco-souza", "")
+	token := github.AccessToken(c)
+	pageParams := config.MakePageParams(token != "")
+
+	props := resumeProps{
+		PageParams:  pageParams,
+		Profile:     user,
+		Description: processBio(user.Bio),
+	}
+
+	return c.Render("resume", props)
 }
 
 func contactURL() string {
@@ -79,11 +107,4 @@ func processBio(text string) template.HTML {
 	})
 
 	return template.HTML(result)
-}
-
-func notFoundHandler(c *fiber.Ctx) error {
-	log.Println("Page not found")
-	return c.
-		Status(http.StatusNotFound).
-		Render("404", config.DefaultPageParams)
 }
