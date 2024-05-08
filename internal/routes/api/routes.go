@@ -30,6 +30,7 @@ func Apply(router fiber.Router) {
 
 	router.Get("/now", nowHandler)
 	router.Get("/sse", sseHandler)
+	router.Get("/resume", resumeHandler)
 
 	if conf.Env == "development" {
 		router.Get("/reload", sseReloadHandler)
