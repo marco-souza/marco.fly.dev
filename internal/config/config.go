@@ -15,6 +15,7 @@ type Config struct {
 	DatabaseUrl string
 	RateLimit   int
 	Github      Github
+	ResumeURL   string
 }
 
 func Load() *Config {
@@ -32,6 +33,7 @@ func Load() *Config {
 		Port:        env("PORT", "3001"),
 		Env:         env("ENV", "development"),
 		DatabaseUrl: env("DB_URL", "./test.db"),
+		ResumeURL:   env("RESUME_URL", "https://raw.githubusercontent.com/marco-souza/resume/main/RESUME.md"),
 		RateLimit:   int(rateLimit),
 		Github:      GithubLoad(),
 	}

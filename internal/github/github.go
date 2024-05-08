@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/gomarkdown/markdown"
 )
 
 type GitHubUser struct {
@@ -61,4 +63,21 @@ func User(username, token string) GitHubUser {
 	}
 
 	return user
+}
+
+func Resume(url string) ([]byte, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		log.Println("Error fetching resume", err)
+		return nil, err
+	}
+
+	// parse resume body into a html template
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Println("Error reading resume body", err)
+		return nil, err
+	}
+
+	return markdown.ToHTML(body, nil, nil), nil
 }
