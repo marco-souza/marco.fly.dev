@@ -10,11 +10,9 @@
     </div>
 
     <div class="gap-8 grid w-full col-span-2">
-        <h1 class="text-2xl">My Resume</h1>
-
         <!-- lazy load resume -->
-        <div hx-get="/api/resume" hx-trigger="load">
-            <img alt="Result loading..." class="htmx-indicator mx-auto" width="80" src="/static/img/bars.svg" />
+        <div hx-get="/api/resume" hx-trigger="load" hx-swap="outerHTML">
+            <img alt="Result loading..." class="htmx-indicator mx-auto" width="64" src="/static/img/bars.svg" />
         </div>
     </div>
 </div>
