@@ -28,9 +28,12 @@ func Apply(router fiber.Router) {
 		Get("/refresh", logoutGithubAuth).
 		Get("/logout", logoutGithubAuth)
 
-	router.Get("/now", nowHandler)
-	router.Get("/sse", sseHandler)
-	router.Get("/resume", resumeHandler)
+	// ref into one Group
+	router.Group("/").
+		Get("/now", nowHandler).
+		Get("/sse", sseHandler).
+		Get("/resume", resumeHandler).
+		Get("/menu", menuHandler)
 
 	if conf.Env == "development" {
 		router.Get("/reload", sseReloadHandler)
