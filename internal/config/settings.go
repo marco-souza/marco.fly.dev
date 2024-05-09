@@ -32,7 +32,8 @@ var PrivatePageParams = PageParams{
 	"https://github.com/marco-souza/marco.fly.io",
 	[]MenuItem{
 		{"/", "Home"},
-		{"/app/", "Dashboard"},
+		{"/resume", "Resume"},
+		{"/app/", "App"},
 		{"/app/playground", "Playground"},
 		{"/app/orders", "Ordero"},
 		{conf.Github.LogoutUrl, "Logout"},
