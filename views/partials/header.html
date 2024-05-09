@@ -10,7 +10,7 @@
 
             <!-- lazy load menu -->
             <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-                hx-get="/api/menu" hx-trigger="load" hx-swap="innerHTML">
+                hx-get="/api/menu" hx-trigger="load" hx-swap="innerHTML" hx-boost="true">
                 <li>
                     <img alt="Result loading..." class="htmx-indicator mx-auto" width="32" src="/static/img/bars.svg" />
                 </li>
