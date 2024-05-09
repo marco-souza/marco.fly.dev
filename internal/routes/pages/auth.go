@@ -22,7 +22,7 @@ func loginHandler(c *fiber.Ctx) error {
 		)
 	}
 	return c.Render("login", loginProps{
-		PageParams: config.MakePageParams(false),
+		PageParams: config.DefaultPageParams,
 		SignInUrl:  cfg.Github.SignInUrl,
 	})
 }

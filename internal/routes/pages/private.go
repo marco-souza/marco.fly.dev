@@ -28,11 +28,10 @@ func dashboardHandler(c *fiber.Ctx) error {
 
 	token := github.AccessToken(c)
 	loggedUser := github.User("", token)
-	pageParams := config.MakePageParams(token != "")
 	// TODO: cache user info
 
 	props := dashboardProps{
-		pageParams,
+		config.DefaultPageParams,
 		loggedUser,
 		loggedUser.Bio,
 		cfg.Github.LogoutUrl,
@@ -44,9 +43,7 @@ func dashboardHandler(c *fiber.Ctx) error {
 
 // user playground
 func playgroundHandler(c *fiber.Ctx) error {
-	token := github.AccessToken(c)
-	pageParams := config.MakePageParams(token != "")
-	return c.Render("playground", pageParams)
+	return c.Render("playground", config.DefaultPageParams)
 }
 
 type ordersProps struct {
@@ -62,11 +59,8 @@ func ordersHandler(c *fiber.Ctx) error {
 	orders := []models.Order{}
 	result := db.Preload("Author").Find(&orders)
 
-	token := github.AccessToken(c)
-	pageParams := config.MakePageParams(token != "")
-
 	props := ordersProps{
-		PageParams: pageParams,
+		PageParams: config.DefaultPageParams,
 		Title:      "All Orders",
 		Orders:     orders,
 		Total:      result.RowsAffected,

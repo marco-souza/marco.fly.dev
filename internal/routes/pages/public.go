@@ -32,10 +32,8 @@ func notFoundHandler(c *fiber.Ctx) error {
 
 func rootHandler(c *fiber.Ctx) error {
 	user := github.User("marco-souza", "")
-	token := github.AccessToken(c)
-	pageParams := config.MakePageParams(token != "")
 	props := rootProps{
-		PageParams:   pageParams,
+		PageParams:   config.DefaultPageParams,
 		PrimaryBtn:   contactURL(),
 		SecondaryBtn: "/resume",
 		Profile:      user,
@@ -49,8 +47,7 @@ func resumeHandler(c *fiber.Ctx) error {
 	log.Println("Building resume page")
 
 	user := github.User("marco-souza", "")
-	token := github.AccessToken(c)
-	pageParams := config.MakePageParams(token != "")
+	pageParams := config.DefaultPageParams
 
 	// set custom title
 	pageParams.Title = fmt.Sprintf("Resume - %s", pageParams.Title)
