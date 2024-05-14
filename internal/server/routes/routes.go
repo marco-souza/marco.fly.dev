@@ -3,8 +3,8 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/marco-souza/marco.fly.dev/internal/routes/api"
-	"github.com/marco-souza/marco.fly.dev/internal/routes/pages"
+	"github.com/marco-souza/marco.fly.dev/internal/server/routes/api"
+	"github.com/marco-souza/marco.fly.dev/internal/server/routes/pages"
 )
 
 func SetupRoutes(app *fiber.App) {

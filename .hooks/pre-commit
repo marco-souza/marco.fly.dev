@@ -3,4 +3,6 @@
 # staged_go_files=$(git diff --name-only --cached | grep '.go')
 # git add $staged_go_files
 
+echo pre-commit: hook started
 make fmt && git update-index --again
+echo pre-commit: hook done

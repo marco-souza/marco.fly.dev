@@ -3,7 +3,10 @@
         <div class="flex flex-col gap-8 sticky top-10">
             {{template "partials/profile" .}}
 
-            <a href="{{.PrimaryBtn}}" class="btn btn-outline text-pink-400 hover:text-white hover:bg-pink-400">
+            <a
+                href="{{.PrimaryBtn}}"
+                class="btn btn-outline text-pink-400 hover:text-white hover:bg-pink-400"
+            >
                 Let's have a Coffee ☕️
             </a>
         </div>
@@ -12,7 +15,12 @@
     <div class="gap-8 grid w-full col-span-2">
         <!-- lazy load resume -->
         <div hx-get="/api/resume" hx-trigger="load" hx-swap="outerHTML">
-            <img alt="Result loading..." class="htmx-indicator mx-auto" width="64" src="/static/img/bars.svg" />
+            <img
+                alt="Result loading..."
+                class="htmx-indicator mx-auto"
+                width="64"
+                src="/static/img/bars.svg"
+            />
         </div>
     </div>
 </div>
