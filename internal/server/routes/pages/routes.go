@@ -2,7 +2,8 @@ package pages
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/marco-souza/marco.fly.dev/internal/routes/middlewares"
+
+	"github.com/marco-souza/marco.fly.dev/internal/server/routes/middlewares"
 )
 
 func Apply(router fiber.Router) {
