@@ -1,40 +1,41 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <title>{{.Title}}</title>
 
-<head>
-    <title>{{.Title}}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="shortcut icon" href="/static/favicon.ico" />
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="shortcut icon" href="/static/favicon.ico" />
+        <!-- tailwind + daisyui -->
+        <link href="/static/daisyui.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/src/index.min.js"></script>
 
-    <!-- tailwind + daisyui -->
-    <link href="/static/daisyui.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/src/index.min.js"></script>
+        <!-- htmx -->
+        <script src="/static/htmx.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
 
-    <!-- htmx -->
-    <script src="/static/htmx.js"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+        <!-- hyperscript -->
+        <script src="/static/hyperscript.js"></script>
 
-    <!-- hyperscript -->
-    <script src="/static/hyperscript.js"></script>
+        <!-- markdown styles -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css"
+            integrity="sha512-h/laqMqQKUXxFuu6aLAaSrXYwGYQ7qk4aYCQ+KJwHZMzAGaEoxMM6h8C+haeJTU1V6E9jrSUnjpEzX23OmV/Aw=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
 
-    <!-- markdown styles -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css"
-        integrity="sha512-h/laqMqQKUXxFuu6aLAaSrXYwGYQ7qk4aYCQ+KJwHZMzAGaEoxMM6h8C+haeJTU1V6E9jrSUnjpEzX23OmV/Aw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        {{template "partials/hot-reload" .}}
+    </head>
 
-    {{template "partials/hot-reload" .}}
-</head>
+    <body id="app" class="container mx-auto">
+        {{template "partials/header" .}}
 
-<body id="app" class="container mx-auto">
-    {{template "partials/header" .}}
+        <main class="mx-auto p-8 max-w-6xl min-h-[70vh]">{{embed}}</main>
 
-    <main class="mx-auto p-8 max-w-6xl min-h-[70vh]">{{embed}}</main>
-
-    {{template "partials/footer" .}}
-</body>
-
+        {{template "partials/footer" .}}
+    </body>
 </html>
