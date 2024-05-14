@@ -1,24 +1,18 @@
-# marco.fly.dev - Fullstack Golang webapp
+# My personal page
 
 ## Introduction
 
-Welcome to my FullStack Go project!
+Welcome to my personal page!
 
 This project showcases a comprehensive web application built using the latest
 tools and technologies in the industry: GoFiber, HTMX, Tailwind, DaisyUI, and
 more.
 
-### HTMX
+## Tech Stack
 
-🚀 <svg width="20" height="20"> <circle cx="10" cy="10" r="8" /></svg> HTMX:
-Powering our modern frontend
+-   🚀 HTMX: Powering our modern frontend
 
-### Golang
-
-📊 <svg width="20" height="20">
-<rect x="10" y="10" width="5" height="5"
-fill="gray" /></svg> Golang: Powering
-our backend services
+-   📊 Golang: Powering our backend services
 
 ### HTMX
 
@@ -45,5 +39,5 @@ internal
 |- entities # core entities of the project
 |- github   # github service
 |- models   # data models (sqlite db)
-|- routes   # routing service
+|- server   # create our backend service
 ```
