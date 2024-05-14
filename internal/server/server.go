@@ -13,7 +13,7 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
 
-type Server struct {
+type server struct {
 	addr     string
 	hostname string
 	port     string
@@ -22,7 +22,7 @@ type Server struct {
 
 var conf = config.Load()
 
-func New() *Server {
+func New() *server {
 	hostname := conf.Hostname
 	port := conf.Port
 	addr := fmt.Sprintf("%s:%s", hostname, port)
@@ -33,7 +33,7 @@ func New() *Server {
 		engine.Reload(true)
 	}
 
-	return &Server{
+	return &server{
 		addr:     addr,
 		port:     port,
 		hostname: hostname,
@@ -44,7 +44,7 @@ func New() *Server {
 	}
 }
 
-func (s *Server) Start() {
+func (s *server) Start() {
 	fmt.Println("setting up routes...")
 	s.setupRoutes()
 
@@ -56,7 +56,7 @@ func (s *Server) Start() {
 	log.Fatal(s.app.Listen(s.addr))
 }
 
-func (s *Server) setupRoutes() {
+func (s *server) setupRoutes() {
 	log.Println("setup static resources")
 	s.app.Static("/static", "./static", fiber.Static{
 		Compress:      true,
