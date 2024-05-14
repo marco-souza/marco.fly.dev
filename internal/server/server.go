@@ -10,7 +10,7 @@ import (
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/models"
-	"github.com/marco-souza/marco.fly.dev/internal/routes"
+	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
 
 type Server struct {
