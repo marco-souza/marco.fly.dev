@@ -3,6 +3,7 @@ module github.com/marco-souza/marco.fly.dev
 go 1.22
 
 require (
+	github.com/Shopify/go-lua v0.0.0-20240312125312-5d657e363856
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/gofiber/storage/sqlite3/v2 v2.1.0
