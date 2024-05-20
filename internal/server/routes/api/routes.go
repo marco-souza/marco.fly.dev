@@ -35,9 +35,10 @@ func Apply(router fiber.Router) {
 	// public routes
 	router.Group("/").
 		Get("/resume", resumeHandler).
-		Get("/menu", menuHandler).
-		// auth
-		Group("/auth/github").
+		Get("/menu", menuHandler)
+
+	// auth
+	router.Group("/auth/github").
 		Get("/", redirectGithubAuth).
 		Get("/callback", callbackGithubAuth).
 		Get("/refresh", logoutGithubAuth).
@@ -48,8 +49,9 @@ func Apply(router fiber.Router) {
 	}
 
 	// private routes
+	router.Use(authMiddleware)
+
 	router.Group("/").
-		Use(authMiddleware).
 		Post("/lua", luaHandler).
 		Get("/now", nowHandler).
 		Get("/sse", sseHandler)
