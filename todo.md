@@ -3,7 +3,6 @@
 ## In-Progress // upcoming
 
     - [ ] handle errors for form validation
-    - [ ] make menu lazyloaded by htmx
 
 ## Backlog
 
@@ -14,6 +13,7 @@
 
 ## Done
 
+    - [x] make menu lazyloaded by htmx
     - [x] make resume page
     - [x] make resume lazy loadede by htmx
     - [x] add midleware for private routes

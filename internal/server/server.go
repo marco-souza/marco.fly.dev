@@ -3,6 +3,8 @@ package server
 import (
 	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -53,7 +55,20 @@ func (s *server) Start() {
 		models.Seed()
 	}
 
-	log.Fatal(s.app.Listen(s.addr))
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
+	teardown := func() {
+		<-shutdown
+		fmt.Println("shutting down server...")
+		s.app.Shutdown()
+	}
+
+	go teardown() // start listening for interrupt signals
+
+	// await for server to shutdown
+	if err := s.app.Listen(s.addr); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (s *server) setupRoutes() {
