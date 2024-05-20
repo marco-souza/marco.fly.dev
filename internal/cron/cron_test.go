@@ -1,20 +1,26 @@
-package cron
+package cron_test
 
 import (
 	"testing"
 
+	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCronJob(t *testing.T) {
-	c := New()
+	c := cron.New()
 	go c.Start()
 	defer c.Stop()
 
+	expressions := []string{
+		"0 * * * *",
+		"* * * * *",
+	}
+
 	t.Run("can add expression", func(t *testing.T) {
-		err := c.Add("* * * * *", func() {})
-		if err != nil {
-			t.Fatal(err)
+		for _, expr := range expressions {
+			err := c.Add(expr, func() {})
+			assert.Nil(t, err)
 		}
 	})
 
@@ -30,29 +36,26 @@ func TestCronJob(t *testing.T) {
 	})
 
 	t.Run("can list expression", func(t *testing.T) {
-		for _, cron := range c.List() {
-			assert.Greater(t, cron.id, 0)
-
-			// TODO: make this pass
-			// if cron.expression == "" {
-			// 	t.Fatal("cron expression invalid", cron)
-			// }
+		for _, entry := range c.List() {
+			assert.Greater(t, entry.ID, 0)
+			assert.Contains(t, expressions, entry.Expression)
 		}
 	})
 
 	t.Run("do nothing if deleting invalid id", func(t *testing.T) {
-		assert.Len(t, c.List(), 1)
+		assert.Len(t, c.List(), len(expressions))
 
 		c.Del(-1)
 
-		assert.Len(t, c.List(), 1)
+		assert.Len(t, c.List(), len(expressions))
 	})
 
 	t.Run("can delete expression", func(t *testing.T) {
-		assert.Len(t, c.List(), 1)
+		size := len(expressions)
+		assert.Len(t, c.List(), size)
 
 		c.Del(1)
 
-		assert.Len(t, c.List(), 0)
+		assert.Len(t, c.List(), size-1)
 	})
 }
