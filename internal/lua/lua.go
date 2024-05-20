@@ -1,7 +1,9 @@
 package lua
 
 import (
+	"io"
 	"log"
+	"os"
 
 	"github.com/Shopify/go-lua"
 )
@@ -18,8 +20,28 @@ func new() *luaRuntime {
 
 func (r *luaRuntime) Run(snippet string) (string, error) {
 	log.Println("Running Lua snippet", snippet)
-	// TODO: get lua execution output: https://github.com/Shopify/go-lua/pull/43
-	return "", lua.DoString(r.l, snippet)
+
+	outputReader, outputWriter, _ := os.Pipe()
+	rescueStdout := os.Stdout // save the actual stdout
+	os.Stdout = outputWriter  //  redirect stdout to pipe
+
+	err := lua.DoString(r.l, snippet)
+	if err != nil {
+		log.Println("Error running Lua snippet", err)
+		return "", err
+	}
+
+	outputWriter.Close()     // close pipe writer
+	os.Stdout = rescueStdout // restore stdout
+
+	output, err := io.ReadAll(outputReader)
+	if err != nil {
+		log.Println("Error reading Lua output", err)
+		return "", err
+	}
+
+	log.Println("Lua output", string(output))
+	return string(output), nil
 }
 
 var Runtime = new()
