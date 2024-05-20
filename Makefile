@@ -17,7 +17,7 @@ fmt:
 
 t: test
 test: ./tests/
-	go test -v ./tests/
+	go test -v ./...
 
 encrypt: .env
 	gpg -c .env

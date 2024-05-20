@@ -8,10 +8,10 @@ import (
 
 func TestLua(t *testing.T) {
 	t.Run("should run code if valid", func(t *testing.T) {
-		snippet := "return 1+1"
+		snippet := "print(10^3)"
 		output, err := Runtime.Run(snippet)
 		assert.Nil(t, err)
-		assert.Equal(t, output, "") // TODO: fix it later
+		assert.Contains(t, output, "1000")
 	})
 
 	t.Run("should error with invalid code", func(t *testing.T) {
