@@ -1,0 +1,19 @@
+<div class="grid cols-1 py-12">
+    <form
+        class="grid cols-1 gap-4"
+        hx-post="/api/lua"
+        method="POST"
+        hx-swap="outerHTML"
+        hx-target="#code-output"
+    >
+        <label for="editor" class="w-full">Enter your Lua code:</label>
+
+        <textarea id="editor" name="snippet" rows="10" cols="80" class="w-full">
+print("Hello, 🌙!")</textarea
+        >
+
+        <button type="submit" class="btn btn-primary w-full">▶️ Run</button>
+    </form>
+
+    <code id="code-output"> No output yet. </code>
+</div>
