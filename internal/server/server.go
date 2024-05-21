@@ -56,22 +56,28 @@ func (s *server) Start() {
 		models.Seed()
 	}
 
+	startup := func() error {
+		fmt.Println("starting services...")
+		cron.CronService.Start()
+		return s.app.Listen(s.addr)
+	}
+
 	teardown := func() {
 		fmt.Println("shutting down services...")
 		cron.CronService.Stop()
+		s.app.Shutdown()
 	}
+
+	// graceful shutdown
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
-
 	go func() {
-		<-shutdown
-		s.app.Shutdown()
+		<-shutdown // wait for shutdown signal
 		teardown()
 	}()
 
 	// await for server to shutdown
-	cron.CronService.Start()
-	if err := s.app.Listen(s.addr); err != nil {
+	if err := startup(); err != nil {
 		teardown()
 		log.Fatal(err)
 	}
