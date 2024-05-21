@@ -19,7 +19,7 @@ func new() *luaRuntime {
 }
 
 func (r *luaRuntime) Run(snippet string) (string, error) {
-	log.Println("Running Lua snippet", snippet)
+	log.Println("Running Lua snippet: ", snippet)
 
 	outputReader, outputWriter, _ := os.Pipe()
 	rescueStdout := os.Stdout // save the actual stdout
@@ -40,7 +40,7 @@ func (r *luaRuntime) Run(snippet string) (string, error) {
 		return "", err
 	}
 
-	log.Println("Lua output", string(output))
+	log.Println("Lua output: ", string(output))
 	return string(output), nil
 }
 
