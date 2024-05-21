@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/template/html/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/models"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
@@ -55,18 +56,23 @@ func (s *server) Start() {
 		models.Seed()
 	}
 
+	teardown := func() {
+		fmt.Println("shutting down services...")
+		cron.CronService.Stop()
+	}
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
-	teardown := func() {
-		<-shutdown
-		fmt.Println("shutting down server...")
-		s.app.Shutdown()
-	}
 
-	go teardown() // start listening for interrupt signals
+	go func() {
+		<-shutdown
+		s.app.Shutdown()
+		teardown()
+	}()
 
 	// await for server to shutdown
+	cron.CronService.Start()
 	if err := s.app.Listen(s.addr); err != nil {
+		teardown()
 		log.Fatal(err)
 	}
 }
