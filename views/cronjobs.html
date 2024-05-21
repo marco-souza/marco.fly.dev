@@ -55,4 +55,18 @@ print("Hello, 🌙!")</textarea
     </form>
 </dialog>
 
-<div id="content">{{template "partials/cron-list" .}}</div>
+<div id="content">
+    <div
+        hx-get="/api/cron"
+        hx-trigger="load"
+        hx-swap="outerHTML"
+        hx-boost="true"
+    >
+        <img
+            alt="Result loading..."
+            class="htmx-indicator mx-auto"
+            width="32"
+            src="/static/img/bars.svg"
+        />
+    </div>
+</div>

@@ -61,7 +61,7 @@ func Apply(router fiber.Router) {
 		Delete("/:id", deleteOrderHandler)
 
 	router.Group("/cron").
-		Get("/", ordersHandler).
+		Get("/", cronsHandler).
 		Post("/", createCronHandler).
 		Delete("/:id", deleteCronHandler)
 }
