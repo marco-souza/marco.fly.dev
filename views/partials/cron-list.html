@@ -7,13 +7,13 @@
             class="card bg-base-100 shadow-xl image-full h-48 hover:animate-pulse"
         >
             <div class="card-body">
-                <h2 class="card-title">{{ .Expression }}</h2>
+                <h2 class="card-title">#{{ .ID}} - {{ .Expression }}</h2>
                 <div class="card-actions justify-end">
                     <button
                         class="btn btn-outline btn-secondary"
                         hx-trigger="click"
                         hx-target="#content"
-                        hx-delete="/api/crons/{{ .ID }}"
+                        hx-delete="/api/cron/{{ .ID }}"
                     >
                         🗑️
                     </button>
