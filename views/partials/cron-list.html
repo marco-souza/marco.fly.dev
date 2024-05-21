@@ -1,0 +1,27 @@
+<h3>{{ .Total }} items</h3>
+
+<div class="gap-4 grid grid-cols-1 lg:grid-cols-2 4xl:grid-cols-4 mt-8">
+    {{range .Crons}}
+    <a href="#">
+        <div
+            class="card bg-base-100 shadow-xl image-full h-48 hover:animate-pulse"
+        >
+            <div class="card-body">
+                <h2 class="card-title">#{{ .ID}} - {{ .Expression }}</h2>
+                <div class="card-actions justify-end">
+                    <button
+                        class="btn btn-outline btn-secondary"
+                        hx-trigger="click"
+                        hx-target="#content"
+                        hx-delete="/api/cron/{{ .ID }}"
+                    >
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        </div>
+    </a>
+    {{else}}
+    <div><strong>no rows</strong></div>
+    {{end}}
+</div>

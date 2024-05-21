@@ -68,3 +68,8 @@ func ordersHandler(c *fiber.Ctx) error {
 
 	return c.Render("orders", props)
 }
+
+// create cronjobs
+func cronHandler(c *fiber.Ctx) error {
+	return c.Render("cronjobs", config.DefaultPageParams)
+}

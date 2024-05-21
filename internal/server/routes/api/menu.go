@@ -25,6 +25,7 @@ func menuHandler(c *fiber.Ctx) error {
 		menu = append(menu, menuItem{"/app/", "App"})
 		menu = append(menu, menuItem{"/app/playground", "Playground"})
 		menu = append(menu, menuItem{"/app/orders", "Ordero"})
+		menu = append(menu, menuItem{"/app/cronjobs", "Task Scheduler"})
 		menu = append(menu, menuItem{cfg.Github.LogoutUrl, "Logout"})
 	}
 

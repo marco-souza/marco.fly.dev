@@ -37,7 +37,6 @@ func Apply(router fiber.Router) {
 		Get("/resume", resumeHandler).
 		Get("/menu", menuHandler)
 
-	// auth
 	router.Group("/auth/github").
 		Get("/", redirectGithubAuth).
 		Get("/callback", callbackGithubAuth).
@@ -60,4 +59,9 @@ func Apply(router fiber.Router) {
 		Get("/", ordersHandler).
 		Post("/", createOrderHandler).
 		Delete("/:id", deleteOrderHandler)
+
+	router.Group("/cron").
+		Get("/", cronsHandler).
+		Post("/", createCronHandler).
+		Delete("/:id", deleteCronHandler)
 }
