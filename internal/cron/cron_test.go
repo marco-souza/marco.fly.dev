@@ -8,7 +8,7 @@ import (
 )
 
 func TestCronJob(t *testing.T) {
-	c := cron.New()
+	c := cron.CronService
 	go c.Start()
 	defer c.Stop()
 

@@ -19,7 +19,7 @@ type Cron struct {
 	Expression string
 }
 
-func New() *cronService {
+func new() *cronService {
 	scheduler := cron.New()
 	exprMap := expressionMap{}
 
@@ -71,3 +71,5 @@ func (c *cronService) Del(id int) {
 	c.scheduler.Remove(cron.EntryID(id))
 	delete(c.registeredExpressions, id)
 }
+
+var CronService = new()
