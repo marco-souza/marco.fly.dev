@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
-	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/github"
 	"github.com/marco-souza/marco.fly.dev/internal/models"
 )
@@ -70,20 +69,7 @@ func ordersHandler(c *fiber.Ctx) error {
 	return c.Render("orders", props)
 }
 
-type cronjobProps struct {
-	config.PageParams
-	Total int
-	Crons []cron.Cron
-}
-
 // create cronjobs
 func cronHandler(c *fiber.Ctx) error {
-	crons := cron.CronService.List()
-	props := cronjobProps{
-		PageParams: config.DefaultPageParams,
-		Crons:      crons,
-		Total:      len(crons),
-	}
-
-	return c.Render("cronjobs", props)
+	return c.Render("cronjobs", config.DefaultPageParams)
 }
