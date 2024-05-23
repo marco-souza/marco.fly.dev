@@ -20,7 +20,7 @@ func fib(n int) int {
 	return fib(n-1) + fib(n-2)
 }
 
-func appendGoFunctions(l *lua.State) error {
+func pushRuntimeLibrary(l *lua.State) error {
 	fibFuncWrapper := func(s *lua.State) int {
 		n, ok := s.ToInteger(1) // pop stack first arg
 		if !ok {
@@ -49,7 +49,7 @@ func new() *luaRuntime {
 	l := lua.NewState()
 
 	lua.OpenLibraries(l)
-	appendGoFunctions(l)
+	pushRuntimeLibrary(l)
 
 	return &luaRuntime{l}
 }
