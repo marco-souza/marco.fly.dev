@@ -1,3 +1,8 @@
+<script
+    type="module"
+    src="https://unpkg.com/@hey-web-components/monaco-editor"
+></script>
+
 <div class="grid cols-1 py-12">
     <form
         class="grid cols-1 gap-4"
@@ -5,15 +10,49 @@
         method="POST"
         hx-swap="outerHTML"
         hx-target="#code-output"
+        id="formeditor"
     >
         <label for="editor" class="w-full">Enter your Lua code:</label>
 
-        <textarea id="editor" name="snippet" rows="10" cols="80" class="w-full">
-print("Hello, 🌙!")</textarea
+        <input type="hidden" id="snippet" name="snippet" />
+        <hey-monaco-editor
+            id="editor"
+            class="w-full min-h-48"
+            language="lua"
+            value='print("Hello from 🌙")'
+            onkeydown="submitOnEnter(event)"
+            onblur="changeSnippet(event)"
         >
+        </hey-monaco-editor>
 
-        <button type="submit" class="btn btn-primary w-full">▶️ Run</button>
+        <button id="run" type="submit" class="btn btn-primary w-full">
+            ▶️ Run (Alt + Enter)
+        </button>
     </form>
 
     <code id="code-output"> No output yet. </code>
 </div>
+
+<script>
+    function changeSnippet(e) {
+        snippet.value = e.target.value;
+        localStorage.snippet = e.target.value;
+    }
+
+    function submitOnEnter(e) {
+        if (e.key === "Enter" && e.altKey) {
+            e.preventDefault();
+            changeSnippet(e);
+            formeditor.requestSubmit();
+        }
+    }
+
+    const defaultSnippet = 'print("Hello from 🌙")';
+    snippet.value = localStorage.snippet || defaultSnippet;
+    editor.value = localStorage.snippet || defaultSnippet;
+    editor.options = {
+        theme: "vs-dark",
+        readOnly: false,
+    };
+    editor.click();
+</script>
