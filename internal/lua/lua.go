@@ -6,19 +6,14 @@ import (
 	"os"
 
 	"github.com/Shopify/go-lua"
+	"github.com/marco-souza/marco.fly.dev/internal/discord"
 )
 
 type luaRuntime struct {
 	l *lua.State
 }
 
-var fMap map[int]int
-
 func fib(n int) int {
-	if val, ok := fMap[n]; ok {
-		return val
-	}
-
 	if n <= 2 {
 		return 1
 	}
@@ -38,21 +33,14 @@ func appendGoFunctions(l *lua.State) error {
 		return 1           // number of results
 	}
 
-	// bind function to lua runtime
+	// bind fib function to lua runtime
 	l.PushGoFunction(fibFuncWrapper)
 	l.SetGlobal("go_fib") // naming function
 
-	// set { api: { discord: { send_message() } } }
-	l.NewTable()
-	l.PushString("discord")
-
-	l.NewTable()
-	l.PushString("send_message")
-	l.PushGoFunction(fibFuncWrapper)
-	l.SetTable(-3)
-
-	l.SetTable(-3)
-	l.SetGlobal("api")
+	// add discord to Runtime
+	if err := discord.DiscordService.PushClientLuaStack(l); err != nil {
+		return err
+	}
 
 	return nil
 }
