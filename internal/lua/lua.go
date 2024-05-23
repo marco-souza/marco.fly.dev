@@ -12,8 +12,35 @@ type luaRuntime struct {
 	l *lua.State
 }
 
+var fMap map[int]int
+
+func fib(n int) int {
+	if val, ok := fMap[n]; ok {
+		return val
+	}
+
+	if n <= 2 {
+		return 1
+	}
+	return fib(n-1) + fib(n-2)
+}
+
 func new() *luaRuntime {
 	l := lua.NewState()
+
+	l.PushGoFunction(func(s *lua.State) int {
+		n, ok := s.ToInteger(1) // pop stack first value
+		if !ok {
+			return 0
+		}
+
+		res := fib(n)
+
+		s.PushInteger(res) // push result to the stack
+		return 1           // number of results
+	})
+	l.SetGlobal("go_fib")
+
 	lua.OpenLibraries(l)
 	return &luaRuntime{l}
 }
