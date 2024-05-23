@@ -25,23 +25,32 @@ func fib(n int) int {
 	return fib(n-1) + fib(n-2)
 }
 
-func new() *luaRuntime {
-	l := lua.NewState()
-
-	l.PushGoFunction(func(s *lua.State) int {
-		n, ok := s.ToInteger(1) // pop stack first value
+func appendGoFunctions(l *lua.State) error {
+	funcWrapper := func(s *lua.State) int {
+		n, ok := s.ToInteger(1) // pop stack first arg
 		if !ok {
-			return 0
+			return 0 // no resutls returned
 		}
 
 		res := fib(n)
 
 		s.PushInteger(res) // push result to the stack
 		return 1           // number of results
-	})
-	l.SetGlobal("go_fib")
+	}
+
+	// bind function to lua runtime
+	l.PushGoFunction(funcWrapper)
+	l.SetGlobal("go_fib") // naming function
+
+	return nil
+}
+
+func new() *luaRuntime {
+	l := lua.NewState()
 
 	lua.OpenLibraries(l)
+	appendGoFunctions(l)
+
 	return &luaRuntime{l}
 }
 
