@@ -26,7 +26,7 @@ func fib(n int) int {
 }
 
 func appendGoFunctions(l *lua.State) error {
-	funcWrapper := func(s *lua.State) int {
+	fibFuncWrapper := func(s *lua.State) int {
 		n, ok := s.ToInteger(1) // pop stack first arg
 		if !ok {
 			return 0 // no resutls returned
@@ -39,8 +39,20 @@ func appendGoFunctions(l *lua.State) error {
 	}
 
 	// bind function to lua runtime
-	l.PushGoFunction(funcWrapper)
+	l.PushGoFunction(fibFuncWrapper)
 	l.SetGlobal("go_fib") // naming function
+
+	// set { api: { discord: { send_message() } } }
+	l.NewTable()
+	l.PushString("discord")
+
+	l.NewTable()
+	l.PushString("send_message")
+	l.PushGoFunction(fibFuncWrapper)
+	l.SetTable(-3)
+
+	l.SetTable(-3)
+	l.SetGlobal("api")
 
 	return nil
 }
