@@ -58,16 +58,16 @@ Here are some of the technical details behind our FullStack Go project:
 ### Project Strcuture
 
 ```sh
-cmd             # entry point of the project (server, cli, etc)
-  server      # server entry point
+cmd            # entry point of the project (server, cli, etc)
+|- server      # server entry point
 
 internal
-  config      # app configs
-  constants   # app constants
-  cron        # cron job module
-  github      # github service
-  lua         # lua runtime
-  models      # data models (gorm)
-  server      # create our backend service
+|- config      # app configs
+|- constants   # app constants
+|- cron        # cron job module
+|- github      # github service
+|- lua         # lua runtime
+|- models      # data models (gorm)
+|- server      # create our backend service
 
 ```
