@@ -17,15 +17,15 @@ Once you have Go installed, you can run the following commands to start the proj
 ```bash
 ## Usage
 
-make                # install dependencies and run
-make install		# install all dependencies
-make run			# run the server
-make deploy			# deploy the server
-make release		# build the server version
-make fmt			# format the code
-make t				# run the tests
-make encrypt		# encrypt the .env file
-make decrypt		# decrypt the .env.gpg file
+make            # install dependencies and run
+make install    # install all dependencies
+make run        # run the server
+make deploy     # deploy the server
+make release    # build the server version
+make fmt        # format the code
+make t          # run the tests
+make encrypt    # encrypt the .env file
+make decrypt    # decrypt the .env.gpg file
 ```
 
 ## Tech Stack
