@@ -1,5 +1,7 @@
 package config
 
+import "github.com/marco-souza/marco.fly.dev/internal/env"
+
 type Github struct {
 	ClientId      string
 	ClientSecret  string
@@ -14,8 +16,8 @@ type Github struct {
 
 func GithubLoad() Github {
 	conf := Github{
-		ClientId:      env("GITHUB_CLIENT_ID", ""),
-		ClientSecret:  env("GITHUB_CLIENT_SECRET", ""),
+		ClientId:      env.Env("GITHUB_CLIENT_ID", ""),
+		ClientSecret:  env.Env("GITHUB_CLIENT_SECRET", ""),
 		DashboardPage: "/app/",
 		LoginPage:     "/login",
 		CallbackUrl:   "/api/auth/github/callback",
