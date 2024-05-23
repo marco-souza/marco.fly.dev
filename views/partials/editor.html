@@ -19,7 +19,6 @@
             id="editor"
             class="w-full min-h-48"
             language="lua"
-            value='print("Hello from 🌙")'
             onkeydown="submitOnEnter(event)"
             onblur="changeSnippet(event)"
         >
@@ -54,5 +53,5 @@
         theme: "vs-dark",
         readOnly: false,
     };
-    editor.click();
+    editor.focus();
 </script>

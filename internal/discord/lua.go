@@ -34,7 +34,7 @@ func sendMsgWrapper(s *lua.State) int {
 	return 1            // number of results
 }
 
-func isWorkDay() bool {
+func isWorkDay(l *lua.State) int {
 	weekend := []time.Weekday{time.Saturday, time.Sunday}
 	weekDay := time.Now().Weekday()
 
@@ -42,14 +42,16 @@ func isWorkDay() bool {
 
 	for _, day := range weekend {
 		if day == weekDay {
-			return false
+			l.PushBoolean(false)
+			return 1
 		}
 	}
 
-	return true
+	l.PushBoolean(true)
+	return 1
 }
 
-func (d *discordService) PushClientLuaStack(l *lua.State) error {
+func (d *discordService) PushClient(l *lua.State) {
 	// ref: https://stackoverflow.com/a/37874926
 	l.NewTable() // {}
 
@@ -58,14 +60,13 @@ func (d *discordService) PushClientLuaStack(l *lua.State) error {
 	l.SetTable(-3)                   // {send_message: sendMsgWrapper}
 
 	l.PushString("is_work_day") // {send_message: sendMsgWrapper}, "is_work_day"
-	l.PushBoolean(isWorkDay())  // {send_message: sendMsgWrapper}, "is_work_day", bool
-	l.SetTable(-3)              // {send_message: sendMsgWrapper, is_work_day: bool}
+	l.PushGoFunction(isWorkDay) // {send_message: sendMsgWrapper}, "is_work_day", isWorkDay
+	l.SetTable(-3)              // {send_message: sendMsgWrapper, is_work_day: isWorkDay}
 
-	l.PushString("auth_url")  // {send_message: sendMsgWrapper, is_work_day: bool}, "auth_url"
-	l.PushString(cfg.AuthURL) // {send_message: sendMsgWrapper, is_work_day: bool}, "auth_url", cfg.auth_url
-	l.SetTable(-3)            // {send_message: sendMsgWrapper, is_work_day: bool, auth_url: cfg.auth_url}
+	l.PushString("auth_url")
+	l.PushString(cfg.AuthURL)
+	l.SetTable(-3)
 
 	// make it available globaly
 	l.SetGlobal("discord")
-	return nil
 }

@@ -13,43 +13,16 @@ type luaRuntime struct {
 	l *lua.State
 }
 
-func fib(n int) int {
-	if n <= 2 {
-		return 1
-	}
-	return fib(n-1) + fib(n-2)
-}
-
-func pushRuntimeLibrary(l *lua.State) error {
-	fibFuncWrapper := func(s *lua.State) int {
-		n, ok := s.ToInteger(1) // pop stack first arg
-		if !ok {
-			return 0 // no resutls returned
-		}
-
-		res := fib(n)
-
-		s.PushInteger(res) // push result to the stack
-		return 1           // number of results
-	}
-
-	// bind fib function to lua runtime
-	l.PushGoFunction(fibFuncWrapper)
-	l.SetGlobal("go_fib") // naming function
-
+func pushRuntimeLibraries(l *lua.State) {
 	// add discord to Runtime
-	if err := discord.DiscordService.PushClientLuaStack(l); err != nil {
-		return err
-	}
-
-	return nil
+	discord.DiscordService.PushClient(l)
 }
 
 func new() *luaRuntime {
 	l := lua.NewState()
 
 	lua.OpenLibraries(l)
-	pushRuntimeLibrary(l)
+	pushRuntimeLibraries(l)
 
 	return &luaRuntime{l}
 }
