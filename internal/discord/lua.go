@@ -47,7 +47,10 @@ func (d *discordService) PushClientLuaStack(l *lua.State) error {
 	l.PushString("send_message")
 	l.PushGoFunction(sendMsgWrapper)
 
-	l.SetTable(-3)
+	l.PushString("auth_url")
+	l.PushString(cfg.AuthURL)
+
+	l.SetTable(-5)
 
 	// make it available globaly
 	l.SetGlobal("discord")
