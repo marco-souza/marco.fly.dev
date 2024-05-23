@@ -6,51 +6,43 @@ import (
 
 func sendMsgWrapper(s *lua.State) int {
 	// get channel from lua
-	channel, ok := s.ToString(1)
+	channel, ok := s.ToString(1) // {channel, message}
 	if !ok {
+		logger.Println("failed to get channel", channel)
 		return 0
 	}
 
 	// get message from lua
-	message, ok := s.ToString(2)
+	message, ok := s.ToString(2) // {channel, message}
 	if !ok {
-		return 0
+		logger.Println("failed to get message", message)
+		s.PushBoolean(false) // {false, channel, message}
+		return 1             // number of results
 	}
 
 	logger.Printf("sending message to channel: (%s) %s", channel, message)
 	if err := DiscordService.SendMessage(channel, message); err != nil {
 		logger.Fatalf("failed to send message: (%s) %s", channel, message)
-		s.PushBoolean(false)
-		return 1 // number of results
+		s.PushBoolean(false) // {false, channel, message}
+		return 1             // number of results
 	}
 
 	logger.Println("message sent!")
-	s.PushBoolean(true)
-	return 1 // number of results
+	s.PushBoolean(true) // {true, channel, message}
+	return 1            // number of results
 }
 
 func (d *discordService) PushClientLuaStack(l *lua.State) error {
-	// l.NewTable()
-	//
-	// 	l.PushString("discord")
-	//
-	// 		l.NewTable()
-	// 		l.PushString("send_message")
-	// 		l.PushGoFunction(sendMsgWrapper)
-	//
-	// 	l.SetTable(-3)
-	//
-	// l.SetTable(-3)
-	// l.SetGlobal("api")
-	l.NewTable()
+	// ref: https://stackoverflow.com/a/37874926
+	l.NewTable() // {}
 
-	l.PushString("send_message")
-	l.PushGoFunction(sendMsgWrapper)
+	l.PushString("send_message")     // {}, "send_message"
+	l.PushGoFunction(sendMsgWrapper) // {}, "send_message", sendMsgWrapper
+	l.SetTable(-3)                   // {send_message: sendMsgWrapper}
 
-	l.PushString("auth_url")
-	l.PushString(cfg.AuthURL)
-
-	l.SetTable(-5)
+	l.PushString("auth_url")  // {send_message: sendMsgWrapper}, "auth_url"
+	l.PushString(cfg.AuthURL) // {send_message: sendMsgWrapper}, "auth_url", cfg.auth_url
+	l.SetTable(-3)            // {send_message: sendMsgWrapper, auth_url: cfg.auth_url}
 
 	// make it available globaly
 	l.SetGlobal("discord")
