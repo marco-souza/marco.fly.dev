@@ -70,7 +70,7 @@ func Resume(url string) ([]byte, error) {
 
 	body, err := fetch(url, "GET", "")
 	if err != nil {
-		log.Fatalln("Error fetching emails", err)
+		log.Fatalln("Error fetching resume", err)
 	}
 
 	return markdown.ToHTML(body, nil, nil), nil

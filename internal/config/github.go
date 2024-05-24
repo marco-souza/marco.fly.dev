@@ -24,7 +24,7 @@ func GithubLoad() Github {
 		RefreshUrl:    "/api/auth/github/refresh",
 		LogoutUrl:     "/api/auth/github/logout",
 		SignInUrl:     "/api/auth/github",
-		Scope:         "read:user",
+		Scope:         "read:user user:email",
 	}
 
 	// TODO: mock for testing

@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 )
@@ -23,7 +24,9 @@ var (
 	}
 )
 
-type Auth struct{}
+type Auth struct {
+	AllowedEmails []string
+}
 
 type GithubCredential struct {
 	ClientId     string `json:"client_id"`
@@ -48,6 +51,27 @@ type AuthToken struct {
 	RefreshToken          string `json:"refresh_token"`
 	ExpiresIn             int    `json:"expires_in"`
 	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in"`
+}
+
+func (a *Auth) IsUserAllowed(token string) bool {
+	emails := Emails(token)
+	if emails == nil {
+		log.Println("failed to fetch emails")
+		return false
+	}
+
+	log.Printf("emails: %v", emails)
+
+	for _, email := range *emails {
+		for _, allowedEmail := range a.AllowedEmails {
+			if email.Email == allowedEmail {
+				log.Printf("user is allowed - email: %v, allowed: %v", email, a.AllowedEmails)
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (a *Auth) FetchAuthToken(code string) (*AuthToken, error) {
@@ -85,7 +109,9 @@ func (a *Auth) RedirectLink(origin string) string {
 	query.Add("client_id", cfg.Github.ClientId)
 	query.Add("redirect_uri", redirectUri)
 
-	redirectUrl.RawQuery = query.Encode()
+	redirectUrl.RawQuery = strings.ReplaceAll(
+		query.Encode(), "+", "%20",
+	)
 
 	log.Printf("parsed url: %s", redirectUrl.String())
 
