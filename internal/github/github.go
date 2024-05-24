@@ -18,41 +18,16 @@ type GitHubUser struct {
 }
 
 func User(username, token string) GitHubUser {
-	// set up the GitHub API endpoint
-	url := fmt.Sprintf("%s/users/%s", BASE_API_URL, username)
-	if len(username) == 0 {
-		log.Println("Loading logged user profile", username, token)
-		url = fmt.Sprintf("%s/user", BASE_API_URL)
+	url := "/user"
+	if len(username) > 0 {
+		url = fmt.Sprintf("/users/%s", username)
 	}
 
 	log.Println("Loading profile", url)
 
-	// make a GET request to the URL
-	client := http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	body, err := fetch(url, "GET", token)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(token) > 0 {
-		req.Header.Add("Authorization", "Bearer "+token)
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check the response status code
-	if resp.StatusCode != http.StatusOK {
-		log.Fatalf("Failed to retrieve profile data: %d", resp.StatusCode)
-	}
-
-	// read body
-	body, err := io.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		log.Fatalf("Failed to parse body: %v", err)
+		log.Fatalln("Error fetching profile", err)
 	}
 
 	// Parse the JSON response
@@ -65,19 +40,78 @@ func User(username, token string) GitHubUser {
 	return user
 }
 
-func Resume(url string) ([]byte, error) {
-	res, err := http.Get(url)
+type GithubEmail struct {
+	Email    string `json:"email"`
+	Primary  bool   `json:"primary"`
+	Verified bool   `json:"verified"`
+}
+
+func Emails(token string) *[]GithubEmail {
+	url := "/user/emails"
+	log.Println("listing emails", url)
+
+	body, err := fetch(url, "GET", token)
 	if err != nil {
-		log.Println("Error fetching resume", err)
-		return nil, err
+		log.Fatalln("Error fetching emails", err)
 	}
 
-	// parse resume body into a html template
-	body, err := io.ReadAll(res.Body)
+	// Parse the JSON response
+	var emails []GithubEmail
+	err = json.Unmarshal(body, &emails)
 	if err != nil {
-		log.Println("Error reading resume body", err)
-		return nil, err
+		log.Fatalf("Failed to unmarshal body: %v", err)
+	}
+
+	return &emails
+}
+
+func Resume(url string) ([]byte, error) {
+	log.Println("fetching resume", url)
+
+	body, err := fetch(url, "GET", "")
+	if err != nil {
+		log.Fatalln("Error fetching emails", err)
 	}
 
 	return markdown.ToHTML(body, nil, nil), nil
+}
+
+func fetch(url, method, token string) ([]byte, error) {
+	body := []byte{}
+	if url[:4] != "http" {
+		// if not a full url, build github api url
+		url = fmt.Sprintf("%s%s", BASE_API_URL, url)
+	}
+
+	// make a GET request to the URL
+	client := http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return body, err
+	}
+
+	if len(token) > 0 {
+		req.Header.Add("Authorization", "Bearer "+token)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return body, err
+	}
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		err := fmt.Errorf("Failed to retrieve data: %d", resp.StatusCode)
+		return body, err
+	}
+
+	// read body
+	body, err = io.ReadAll(resp.Body)
+	// defer resp.Body.Close()
+	if err != nil {
+		err := fmt.Errorf("Failed to read body: %v", err)
+		return body, err
+	}
+
+	return body, nil
 }
