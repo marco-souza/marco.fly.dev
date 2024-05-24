@@ -31,12 +31,12 @@ func notFoundHandler(c *fiber.Ctx) error {
 }
 
 func rootHandler(c *fiber.Ctx) error {
-	user := github.User("marco-souza", "")
+	user, _ := github.User("marco-souza", "")
 	props := rootProps{
 		PageParams:   config.DefaultPageParams,
 		PrimaryBtn:   contactURL(),
 		SecondaryBtn: "/resume",
-		Profile:      user,
+		Profile:      *user,
 		Description:  processBio(user.Bio),
 	}
 
@@ -46,7 +46,7 @@ func rootHandler(c *fiber.Ctx) error {
 func resumeHandler(c *fiber.Ctx) error {
 	log.Println("Building resume page")
 
-	user := github.User("marco-souza", "")
+	user, _ := github.User("marco-souza", "")
 	pageParams := config.DefaultPageParams
 
 	// set custom title
@@ -55,7 +55,7 @@ func resumeHandler(c *fiber.Ctx) error {
 	props := rootProps{
 		PageParams:  pageParams,
 		PrimaryBtn:  contactURL(),
-		Profile:     user,
+		Profile:     *user,
 		Description: processBio(user.Bio),
 	}
 

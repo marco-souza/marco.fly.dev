@@ -27,12 +27,12 @@ func dashboardHandler(c *fiber.Ctx) error {
 	}
 
 	token := github.AccessToken(c)
-	loggedUser := github.User("", token)
+	loggedUser, _ := github.User("", token)
 	// TODO: cache user info
 
 	props := dashboardProps{
 		config.DefaultPageParams,
-		loggedUser,
+		*loggedUser,
 		loggedUser.Bio,
 		cfg.Github.LogoutUrl,
 		breadcrumbs,

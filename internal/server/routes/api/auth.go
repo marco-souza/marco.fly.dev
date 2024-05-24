@@ -11,8 +11,12 @@ import (
 )
 
 var (
-	auth = github.Auth{}
-	cfg  = config.Load()
+	auth = github.Auth{
+		AllowedEmails: map[string]bool{
+			"ma.souza.junior@gmail.com": true,
+		},
+	}
+	cfg = config.Load()
 )
 
 func redirectGithubAuth(c *fiber.Ctx) error {
@@ -32,6 +36,12 @@ func callbackGithubAuth(c *fiber.Ctx) error {
 
 	code := queries["code"]
 	authToken, _ := auth.FetchAuthToken(code)
+
+	// check if the user is allowed
+	if !auth.IsUserAllowed(authToken.AccessToken) {
+		log.Println("user is not allowed")
+		return c.Redirect(cfg.Github.LoginPage+"?error=unauthorized", fiber.StatusTemporaryRedirect)
+	}
 
 	log.Print("settings auth cookies")
 	cookies.SetAuthCookies(authToken)

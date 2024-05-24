@@ -12,6 +12,7 @@ import (
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
+	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/models"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
@@ -59,12 +60,18 @@ func (s *server) Start() {
 	startup := func() error {
 		fmt.Println("starting services...")
 		cron.CronService.Start()
+
+		if err := discord.DiscordService.Open(); err != nil {
+			return err
+		}
+
 		return s.app.Listen(s.addr)
 	}
 
 	teardown := func() {
 		fmt.Println("shutting down services...")
 		cron.CronService.Stop()
+		discord.DiscordService.Close()
 		s.app.Shutdown()
 	}
 

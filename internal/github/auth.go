@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 )
@@ -23,7 +24,9 @@ var (
 	}
 )
 
-type Auth struct{}
+type Auth struct {
+	AllowedEmails map[string]bool
+}
 
 type GithubCredential struct {
 	ClientId     string `json:"client_id"`
@@ -48,6 +51,31 @@ type AuthToken struct {
 	RefreshToken          string `json:"refresh_token"`
 	ExpiresIn             int    `json:"expires_in"`
 	RefreshTokenExpiresIn int    `json:"refresh_token_expires_in"`
+}
+
+func (a *Auth) IsUserAllowed(token string) bool {
+	emails, err := Emails(token)
+	if err != nil {
+		log.Println("failed to fetch emails", err)
+		return false
+	}
+
+	log.Printf("emails: %v, allowed: %v", emails, a.AllowedEmails)
+
+	for _, email := range emails {
+		isValid, ok := a.AllowedEmails[email.Email]
+		if !ok {
+			log.Println("email is not allowed, checking next")
+			continue
+		}
+
+		if isValid {
+			return true
+		}
+	}
+
+	log.Println("user is not allowed")
+	return false
 }
 
 func (a *Auth) FetchAuthToken(code string) (*AuthToken, error) {
@@ -85,7 +113,9 @@ func (a *Auth) RedirectLink(origin string) string {
 	query.Add("client_id", cfg.Github.ClientId)
 	query.Add("redirect_uri", redirectUri)
 
-	redirectUrl.RawQuery = query.Encode()
+	redirectUrl.RawQuery = strings.ReplaceAll(
+		query.Encode(), "+", "%20",
+	)
 
 	log.Printf("parsed url: %s", redirectUrl.String())
 

@@ -6,15 +6,24 @@ import (
 	"os"
 
 	"github.com/Shopify/go-lua"
+	"github.com/marco-souza/marco.fly.dev/internal/discord"
 )
 
 type luaRuntime struct {
 	l *lua.State
 }
 
+func pushRuntimeLibraries(l *lua.State) {
+	// add discord to Runtime
+	discord.DiscordService.PushClient(l)
+}
+
 func new() *luaRuntime {
 	l := lua.NewState()
+
 	lua.OpenLibraries(l)
+	pushRuntimeLibraries(l)
+
 	return &luaRuntime{l}
 }
 
