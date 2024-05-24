@@ -25,7 +25,7 @@ var (
 )
 
 type Auth struct {
-	AllowedEmails []string
+	AllowedEmails map[string]bool
 }
 
 type GithubCredential struct {
@@ -54,23 +54,27 @@ type AuthToken struct {
 }
 
 func (a *Auth) IsUserAllowed(token string) bool {
-	emails := Emails(token)
-	if emails == nil {
-		log.Println("failed to fetch emails")
+	emails, err := Emails(token)
+	if err != nil {
+		log.Println("failed to fetch emails", err)
 		return false
 	}
 
-	log.Printf("emails: %v", emails)
+	log.Printf("emails: %v, allowed: %v", emails, a.AllowedEmails)
 
-	for _, email := range *emails {
-		for _, allowedEmail := range a.AllowedEmails {
-			if email.Email == allowedEmail {
-				log.Printf("user is allowed - email: %v, allowed: %v", email, a.AllowedEmails)
-				return true
-			}
+	for _, email := range emails {
+		isValid, ok := a.AllowedEmails[email.Email]
+		if !ok {
+			log.Println("email is not allowed, checking next")
+			continue
+		}
+
+		if isValid {
+			return true
 		}
 	}
 
+	log.Println("user is not allowed")
 	return false
 }
 

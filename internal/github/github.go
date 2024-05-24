@@ -46,23 +46,24 @@ type GithubEmail struct {
 	Verified bool   `json:"verified"`
 }
 
-func Emails(token string) *[]GithubEmail {
+func Emails(token string) ([]GithubEmail, error) {
 	url := "/user/emails"
 	log.Println("listing emails", url)
 
 	body, err := fetch(url, "GET", token)
 	if err != nil {
-		log.Fatalln("Error fetching emails", err)
+		return nil, err
 	}
 
 	// Parse the JSON response
 	var emails []GithubEmail
 	err = json.Unmarshal(body, &emails)
 	if err != nil {
-		log.Fatalf("Failed to unmarshal body: %v", err)
+		log.Printf("Failed to unmarshal body: %v", err)
+		return nil, err
 	}
 
-	return &emails
+	return emails, nil
 }
 
 func Resume(url string) ([]byte, error) {

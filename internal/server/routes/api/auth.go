@@ -12,8 +12,8 @@ import (
 
 var (
 	auth = github.Auth{
-		AllowedEmails: []string{
-			"ma.souza.junior@gmail.com",
+		AllowedEmails: map[string]bool{
+			"ma.souza.junior@gmail.com": true,
 		},
 	}
 	cfg = config.Load()
