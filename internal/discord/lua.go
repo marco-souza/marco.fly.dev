@@ -24,7 +24,7 @@ func sendMsgWrapper(s *lua.State) int {
 
 	logger.Printf("sending message to channel: (%s) %s", channel, message)
 	if err := DiscordService.SendMessage(channel, message); err != nil {
-		logger.Fatalf("failed to send message: (%s) %s", channel, message)
+		logger.Printf("failed to send message: (%s) %s", channel, message)
 		s.PushBoolean(false) // {false, channel, message}
 		return 1             // number of results
 	}

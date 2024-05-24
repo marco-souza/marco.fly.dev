@@ -35,7 +35,8 @@ func User(username, token string) (*GitHubUser, error) {
 	var user GitHubUser
 	err = json.Unmarshal(body, &user)
 	if err != nil {
-		log.Fatalf("Failed to unmarshal body: %v", err)
+		log.Printf("Failed to unmarshal body: %v", err)
+		return nil, err
 	}
 
 	return &user, nil
@@ -72,7 +73,8 @@ func Resume(url string) ([]byte, error) {
 
 	body, err := fetch(url, "GET", "")
 	if err != nil {
-		log.Fatalln("Error fetching resume", err)
+		log.Println("Error fetching resume", err)
+		return nil, err
 	}
 
 	return markdown.ToHTML(body, nil, nil), nil
