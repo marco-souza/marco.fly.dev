@@ -17,7 +17,7 @@ type GitHubUser struct {
 	Avatar string `json:"avatar_url"`
 }
 
-func User(username, token string) GitHubUser {
+func User(username, token string) (*GitHubUser, error) {
 	url := "/user"
 	if len(username) > 0 {
 		url = fmt.Sprintf("/users/%s", username)
@@ -27,7 +27,8 @@ func User(username, token string) GitHubUser {
 
 	body, err := fetch(url, "GET", token)
 	if err != nil {
-		log.Fatalln("Error fetching profile", err)
+		log.Println("Error fetching profile", err)
+		return nil, err
 	}
 
 	// Parse the JSON response
@@ -37,7 +38,7 @@ func User(username, token string) GitHubUser {
 		log.Fatalf("Failed to unmarshal body: %v", err)
 	}
 
-	return user
+	return &user, nil
 }
 
 type GithubEmail struct {
@@ -108,7 +109,6 @@ func fetch(url, method, token string) ([]byte, error) {
 
 	// read body
 	body, err = io.ReadAll(resp.Body)
-	// defer resp.Body.Close()
 	if err != nil {
 		err := fmt.Errorf("Failed to read body: %v", err)
 		return body, err
