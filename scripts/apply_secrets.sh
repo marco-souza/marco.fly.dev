@@ -1,5 +1,5 @@
 #! /bin/sh
-file=$(cat .env | grep =)
+file=$(cat .env | grep = | grep -v "#")
 for line in $file; do
   echo "Applying secret to fly.io"
   fly secrets set $line
