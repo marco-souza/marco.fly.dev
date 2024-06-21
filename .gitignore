@@ -11,3 +11,6 @@ build/
 dist/
 *fiber*
 *_templ.go
+
+# tasks
+.task
