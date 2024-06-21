@@ -1,6 +1,7 @@
 name: Quality Gateway
 
 on:
+  pull_request:
   push:
     branches:
       - main

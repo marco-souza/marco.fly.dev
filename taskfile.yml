@@ -1,0 +1,33 @@
+# ref: https://github.com/air-verse/air/issues/614#issuecomment-2183041485
+version: "3"
+
+interval: 100ms
+
+vars:
+    NAME: "server"
+    BIN_NAME: "{{.NAME}}_bin"
+
+tasks:
+  dev:
+    desc: Run app in development mode with reload
+    watch: true
+    sources:
+      - "**/*.go"
+      - "assets/**/*"
+      - "views/**/*"
+      - exclude: tmp/**/*
+    deps:
+      - kill
+    cmds:
+      - CGO_ENABLED=1 go build -o ./tmp/{{.BIN_NAME}} cmd/server/main.go
+      - ./tmp/{{.BIN_NAME}}
+    status: ["false"]
+
+  kill:
+    cmds:
+      - killall -q {{.BIN_NAME}} || echo "Process was not running."
+
+  # css:
+  #   cmds:
+  #     - tailwindcss -o public/css/styles.css
+

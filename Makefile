@@ -1,12 +1,12 @@
 all: install run
 
 install:
-	go install github.com/cosmtrek/air@latest && \
+	go install github.com/go-task/task/v3/cmd/task@latest && \
 	go install golang.org/x/tools/gopls@latest && \
 	go install github.com/marco-souza/hooker@latest && hooker init
 
 run: cmd/server/main.go
-	air
+	task dev
 
 deploy: ./fly.toml
 	pkgx fly deploy --now -y
