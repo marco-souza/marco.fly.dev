@@ -4,6 +4,7 @@ go 1.22
 
 require (
 	github.com/Shopify/go-lua v0.0.0-20240312125312-5d657e363856
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/gofiber/storage/sqlite3/v2 v2.1.0
@@ -19,7 +20,6 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.6 // indirect
-	github.com/bwmarrin/discordgo v0.28.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
