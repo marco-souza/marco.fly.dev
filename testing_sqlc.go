@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	if err := db.Init("./db.sql"); err != nil {
+	if err := db.Init("./sqlite.db"); err != nil {
 		fmt.Println("error creating cronjob: ", db.Ctx, err)
 		panic(err)
 	}

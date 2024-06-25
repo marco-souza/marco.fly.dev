@@ -5,10 +5,8 @@ import (
 	"database/sql"
 	"log"
 
-	// internal
 	"github.com/marco-souza/marco.fly.dev/internal/db/sqlc"
 
-	// sqlite3 driver
 	_ "embed"
 	_ "github.com/mattn/go-sqlite3"
 )
