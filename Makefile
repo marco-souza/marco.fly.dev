@@ -23,7 +23,7 @@ fmt:
 	go fmt ./... && npx prettier -w views ./README.md ./docker-compose.yml
 
 t: test
-test: install generate ./tests/
+test: ./tests/
 	go test -v ./...
 
 encrypt: .env
