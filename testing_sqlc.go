@@ -42,8 +42,9 @@ func main() {
 
 	// update cron
 	cronUpdatePayload := sqlc.UpdateCronJobParams{
-		ID:   fetchedCron.ID,
-		Name: "test2",
+		ID:     fetchedCron.ID,
+		Script: fetchedCron.Script,
+		Name:   fmt.Sprintf("n:%s-i:%d", fetchedCron.Name, fetchedCron.ID),
 	}
 
 	if err = client.UpdateCronJob(db.Ctx, cronUpdatePayload); err != nil {
