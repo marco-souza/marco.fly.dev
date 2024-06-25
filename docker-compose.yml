@@ -1,14 +1,14 @@
 version: "3.8"
 services:
-    app:
-        build:
-            context: .
-            target: dev
-            dockerfile: Dockerfile
-        environment:
-            HOST: "0.0.0.0"
-            PORT: 8080
-        ports:
-            - 8080:8080
-        volumes:
-            - ./:/app
+  app:
+    build:
+      context: .
+      target: dev
+      dockerfile: Dockerfile
+    environment:
+      HOST: "0.0.0.0"
+      PORT: 8080
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/app
