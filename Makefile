@@ -12,8 +12,10 @@ run: cmd/server/main.go
 deploy: ./fly.toml
 	pkgx fly deploy --now -y
 
-release: cmd/server/main.go
-	sqlc generate && \
+generate: sqlc.yml
+	sqlc generate
+
+release: cmd/server/main.go generate
 	CGO_CFLAGS="-D_LARGEFILE64_SOURCE" CGO_ENABLED=1 \
 	go build -ldflags "-s -w" -o ./build/server ./cmd/server/main.go
 
@@ -21,7 +23,7 @@ fmt:
 	go fmt ./... && npx prettier -w views ./README.md ./docker-compose.yml
 
 t: test
-test: ./tests/
+test: ./tests/ generate
 	go test -v ./...
 
 encrypt: .env
