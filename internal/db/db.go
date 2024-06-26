@@ -23,7 +23,6 @@ var ddl string
 func Init(file string) error {
 	log.Println("init db")
 
-	// TODO: use a file
 	if file == "" {
 		file = ":memory:"
 	}
