@@ -17,4 +17,4 @@ jobs:
       - run: |
           make install && \
           make generate && \
-          make t
+          make test
