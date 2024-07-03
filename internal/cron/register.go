@@ -1,20 +1,16 @@
 // This file contains the scheduler package which is responsible for scheduling the tasks to be executed.
-package scheduler
+package cron
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/lua"
 )
 
 // Setup scheduler by initializing cronjobs, registering lua scripts persisted
-func Setup() error {
-	log.Println("setting up scheduler")
-	cron.CronService.Start()
-
+func registerPersistedJobs() error {
 	log.Println("loading persisted cron jobs")
 	crons, err := db.Queries.ListCronJobs(db.Ctx)
 	if err != nil {
@@ -41,18 +37,11 @@ func Setup() error {
 			}
 		}
 
-		if err := cron.CronService.Add(c.Expression, cronHandler); err != nil {
+		if err := CronService.Add(c.Expression, cronHandler); err != nil {
 			logger.Printf("error adding cron job: %s (%e)\n", c.Name, err)
 			return err
 		}
 	}
 
-	return nil
-}
-
-// Close scheduler by stopping the cron CronService
-func Close() error {
-	log.Println("closing scheduler")
-	cron.CronService.Stop()
 	return nil
 }

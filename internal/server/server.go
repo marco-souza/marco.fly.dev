@@ -11,10 +11,10 @@ import (
 	"github.com/gofiber/template/html/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
+	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/models"
-	"github.com/marco-souza/marco.fly.dev/internal/scheduler"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
 
@@ -65,7 +65,7 @@ func (s *server) Start() {
 			return err
 		}
 
-		if err := scheduler.Setup(); err != nil {
+		if err := cron.CronService.Start(); err != nil {
 			return err
 		}
 
@@ -80,10 +80,16 @@ func (s *server) Start() {
 		fmt.Println("shutting down services...")
 		db.Close() // TODO: deprecate
 
-		scheduler.Close()
+		cron.CronService.Stop()
 		discord.DiscordService.Close()
 
-		s.app.Shutdown()
+		if err := s.app.Shutdown(); err != nil {
+			log.Fatal(err)
+		}
+
+		if err := db.Close(); err != nil {
+			log.Fatalf("error closing db: %e", err)
+		}
 	}
 
 	// graceful shutdown

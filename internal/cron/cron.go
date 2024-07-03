@@ -29,9 +29,10 @@ func new() *cronService {
 	}
 }
 
-func (c *cronService) Start() {
+func (c *cronService) Start() error {
 	log.Println("starting scheduler")
 	c.scheduler.Start()
+	return registerPersistedJobs()
 }
 
 func (c *cronService) Stop() {

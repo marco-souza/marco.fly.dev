@@ -4,11 +4,16 @@ import (
 	"testing"
 
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
+	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCronJob(t *testing.T) {
 	c := cron.CronService
+
+	db.Init("")
+	defer db.Close()
+
 	go c.Start()
 	defer c.Stop()
 
