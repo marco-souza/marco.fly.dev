@@ -20,13 +20,13 @@ func menuHandler(c *fiber.Ctx) error {
 	}
 
 	if token != "" {
-		menu = menu[:len(menu)-1] // remove login item
-
-		menu = append(menu, menuItem{"/app/", "App"})
-		menu = append(menu, menuItem{"/app/playground", "Playground"})
-		menu = append(menu, menuItem{"/app/orders", "Ordero"})
-		menu = append(menu, menuItem{"/app/cronjobs", "Task Scheduler"})
-		menu = append(menu, menuItem{cfg.Github.LogoutUrl, "Logout"})
+		menu = []menuItem{
+			{"/app/", "Dashboard"},
+			{"/app/playground", "Playground"},
+			{"/app/orders", "Ordero"},
+			{"/app/cronjobs", "Task Scheduler"},
+			{"/logout", "Logout"},
+		}
 	}
 
 	params := fiber.Map{"MenuItems": menu}
