@@ -1,24 +1,18 @@
-<div class="text-center grid gap-4">
-    <h1 class="text-2xl">{{.Title}}</h1>
-
-    <button
-        hx-trigger="click, every 1m"
-        hx-get="/api/now"
-        hx-swap="innerHTML"
-        hx-target="#time"
-        hx-indicator="#indicator"
-        class="btn btn-secondary"
-    >
-        What time is it?
-    </button>
-
-    <div id="indicator" class="htmx-indicator loading loading-spinner"></div>
-    <div id="time">loading timer...</div>
-</div>
-
-<div hx-ext="sse" sse-connect="/api/sse" sse-swap="message">
-    Contents of this box will be updated in real time with every SSE message
-    received from the chatroom.
-</div>
+<!--<div class="text-center grid gap-4">-->
+<!--    <h1 class="text-2xl">{{.Title}}</h1>-->
+<!---->
+<!--    <button hx-trigger="click, every 1m" hx-get="/api/now" hx-swap="innerHTML" hx-target="#time"-->
+<!--        hx-indicator="#indicator" class="btn btn-secondary">-->
+<!--        What time is it?-->
+<!--    </button>-->
+<!---->
+<!--    <div id="indicator" class="htmx-indicator loading loading-spinner"></div>-->
+<!--    <div id="time">loading timer...</div>-->
+<!--</div>-->
+<!---->
+<!--<div hx-ext="sse" sse-connect="/api/sse" sse-swap="message">-->
+<!--    Contents of this box will be updated in real time with every SSE message-->
+<!--    received from the chatroom.-->
+<!--</div>-->
 
 {{ template "partials/editor" . }}

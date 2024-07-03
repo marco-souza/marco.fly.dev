@@ -1,0 +1,40 @@
+<script
+    type="module"
+    src="https://unpkg.com/@hey-web-components/monaco-editor"
+></script>
+
+<label for="editor" class="w-full label">Enter your Lua code:</label>
+
+<input type="hidden" id="snippet" name="snippet" />
+<hey-monaco-editor
+    id="editor"
+    class="w-full min-h-48"
+    language="lua"
+    onkeydown="submitOnEnter(event)"
+    onblur="changeSnippet(event)"
+>
+</hey-monaco-editor>
+
+<script>
+    function changeSnippet(e) {
+        snippet.value = e.target.value;
+        localStorage.snippet = e.target.value;
+    }
+
+    function submitOnEnter(e) {
+        if (e.key === "Enter" && e.altKey) {
+            e.preventDefault();
+            changeSnippet(e);
+            document.querySelector("#formeditor").requestSubmit();
+        }
+    }
+
+    const defaultSnippet = 'print("Hello from 🌙")';
+    snippet.value = localStorage.snippet || defaultSnippet;
+    editor.value = localStorage.snippet || defaultSnippet;
+    editor.options = {
+        theme: "vs-dark",
+        readOnly: false,
+    };
+    editor.focus();
+</script>
