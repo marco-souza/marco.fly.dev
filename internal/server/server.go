@@ -65,7 +65,7 @@ func (s *server) Start() {
 			return err
 		}
 
-		if err := cron.CronService.Start(); err != nil {
+		if err := cron.Start(); err != nil {
 			return err
 		}
 
@@ -80,7 +80,7 @@ func (s *server) Start() {
 		fmt.Println("shutting down services...")
 		db.Close() // TODO: deprecate
 
-		cron.CronService.Stop()
+		cron.Stop()
 		discord.DiscordService.Close()
 
 		if err := s.app.Shutdown(); err != nil {

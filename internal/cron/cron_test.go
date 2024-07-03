@@ -1,6 +1,7 @@
 package cron_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
@@ -9,13 +10,11 @@ import (
 )
 
 func TestCronJob(t *testing.T) {
-	c := cron.CronService
-
 	db.Init("")
 	defer db.Close()
 
-	go c.Start()
-	defer c.Stop()
+	cron.Start()
+	defer cron.Stop()
 
 	expressions := []string{
 		"0 * * * *",
@@ -24,43 +23,48 @@ func TestCronJob(t *testing.T) {
 
 	t.Run("can add expression", func(t *testing.T) {
 		for _, expr := range expressions {
-			err := c.Add(expr, func() {})
+			err := cron.AddScript(expr, expr, "print('hello lua')")
 			assert.Nil(t, err)
 		}
 	})
 
 	t.Run("fail if expression is invalid", func(t *testing.T) {
-		err := c.Add("* * * * * *", func() {})
+		err := cron.AddScript("first", "* * * * * *", "print('hello lua')")
 		assert.Contains(t, err.Error(), "6")
 
-		err = c.Add("invalid", func() {})
+		err = cron.AddScript("second", "invalid", "print('hello lua')")
 		assert.Contains(t, err.Error(), "invalid")
 
-		err = c.Add("1ms", func() {})
+		err = cron.AddScript("third", "1ms", "print('hello lua')")
 		assert.Contains(t, err.Error(), "1ms")
 	})
 
 	t.Run("can list expression", func(t *testing.T) {
-		for _, entry := range c.List() {
-			assert.Greater(t, entry.ID, 0)
-			assert.Contains(t, expressions, entry.Expression)
+		crons := cron.List()
+		fmt.Println(crons)
+		assert.Equal(t, len(crons), 2)
+
+		for _, cronEntry := range crons {
+			fmt.Println("{?:}", cronEntry)
+			assert.Greater(t, int(cronEntry.ID), 0)
+			assert.Contains(t, expressions, cronEntry.Expression)
 		}
 	})
 
 	t.Run("do nothing if deleting invalid id", func(t *testing.T) {
-		assert.Len(t, c.List(), len(expressions))
+		assert.Len(t, cron.List(), len(expressions))
 
-		c.Del(-1)
+		cron.Del(-1)
 
-		assert.Len(t, c.List(), len(expressions))
+		assert.Len(t, cron.List(), len(expressions))
 	})
 
 	t.Run("can delete expression", func(t *testing.T) {
 		size := len(expressions)
-		assert.Len(t, c.List(), size)
+		assert.Len(t, cron.List(), size)
 
-		c.Del(1)
+		cron.Del(1)
 
-		assert.Len(t, c.List(), size-1)
+		assert.Len(t, cron.List(), size-1)
 	})
 }

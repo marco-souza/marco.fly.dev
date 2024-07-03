@@ -37,11 +37,23 @@ func registerPersistedJobs() error {
 			}
 		}
 
-		if err := CronService.Add(c.Expression, cronHandler); err != nil {
+		if err := register(int(c.ID), c.Expression, cronHandler); err != nil {
 			logger.Printf("error adding cron job: %s (%e)\n", c.Name, err)
 			return err
 		}
 	}
+
+	return nil
+}
+
+func register(id int, cronExpr string, handler func()) error {
+	entryID, err := scheduler.AddFunc(cronExpr, handler)
+	if err != nil {
+		return err
+	}
+
+	runningJobs[id] = entryID
+	log.Println("cron job registered: ", entryID)
 
 	return nil
 }
