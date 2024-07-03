@@ -25,7 +25,6 @@ func registerPersistedJobs() error {
 
 	log.Println("setup persisted cron jobs: ", len(crons))
 	for _, c := range crons {
-		// TODO: running id
 		logPrefix := fmt.Sprintf("cronjob: [%d]: ", c.ID)
 		logger := log.New(log.Writer(), logPrefix, log.Flags())
 
