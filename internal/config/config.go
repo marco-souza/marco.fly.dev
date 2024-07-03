@@ -11,6 +11,7 @@ type Config struct {
 	Hostname    string
 	Port        string
 	Env         string // development | production
+	SqliteUrl   string
 	DatabaseUrl string
 	RateLimit   int
 	ResumeURL   string
@@ -28,7 +29,8 @@ func Load() *Config {
 		Hostname:    env.Env("HOST", "localhost"),
 		Port:        env.Env("PORT", "3001"),
 		Env:         env.Env("ENV", "development"),
-		DatabaseUrl: env.Env("DB_URL", "./test.db"),
+		DatabaseUrl: env.Env("DB_URL", "./test.db"), // TODO: deprecate
+		SqliteUrl:   env.Env("DB_URL", "./test.db"),
 		ResumeURL:   env.Env("RESUME_URL", "https://raw.githubusercontent.com/marco-souza/resume/main/RESUME.md"),
 		RateLimit:   int(rateLimit),
 		Github:      GithubLoad(),
