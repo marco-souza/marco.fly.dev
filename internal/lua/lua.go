@@ -4,10 +4,13 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/Shopify/go-lua"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 )
+
+var stdoutLock = &sync.Mutex{}
 
 func Run(snippet string) (string, error) {
 	// setup lua runtime
@@ -17,12 +20,12 @@ func Run(snippet string) (string, error) {
 	pushRuntimeLibraries(l)
 
 	// running lua snippet
+	stdoutLock.Lock()
+	defer stdoutLock.Unlock()
+
 	outputReader, outputWriter, _ := os.Pipe()
 	rescueStdout := os.Stdout // save the actual stdout
-	// FIXME: this is a shared variable, and if causes some jobs to print using the original stdout
-	//	  instead of pipeing it to the execution output. As we're running concurrently, we'd need
-	//    to lock this resource and execute code snippets sync.
-	os.Stdout = outputWriter //  redirect stdout to pipe
+	os.Stdout = outputWriter  //  redirect stdout to pipe
 
 	err := lua.DoString(l, snippet)
 	if err != nil {
