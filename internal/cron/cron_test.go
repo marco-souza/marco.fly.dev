@@ -11,10 +11,10 @@ import (
 func TestCronJob(t *testing.T) {
 	db.Init("")
 	defer db.Close()
-	
+
 	cron.Start()
 	defer cron.Stop()
-	
+
 	luaScript := "print('hello lua')"
 	expressions := []string{
 		"0 * * * *",
