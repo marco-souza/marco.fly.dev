@@ -28,7 +28,19 @@
             hx-target="#content"
             _="on htmx:afterRequest reset() me"
         >
-            <div class="label" for="id">
+            <div class="label" for="name">
+                <span class="label-text">Task Name:</span>
+            </div>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Type a name for this job"
+                value="Task #1"
+                class="input input-bordered w-full max-w-xs"
+            />
+
+            <div class="label" for="cron">
                 <span class="label-text">Cron Expression:</span>
             </div>
             <input
@@ -36,15 +48,11 @@
                 id="cron"
                 name="cron"
                 placeholder="Type a cronjob expression"
+                value="* * * * *"
                 class="input input-bordered w-full max-w-xs"
             />
 
-            <div class="label" for="editor">
-                <span class="label-text">Lua callback:</span>
-            </div>
-            <textarea id="editor" name="snippet" rows="10" class="w-full">
-print("Hello, 🌙!")</textarea
-            >
+            <div class="w-fill">{{ template "partials/editor-input" . }}</div>
 
             <button class="btn" type="submit">Create Cronjob</button>
         </form>

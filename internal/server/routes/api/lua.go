@@ -17,7 +17,7 @@ func luaHandler(c *fiber.Ctx) error {
 	}
 
 	log.Println("Lua code:", snippet)
-	code, err := lua.Runtime.Run(snippet)
+	code, err := lua.Run(snippet)
 	if err != nil {
 		log.Println("Lua error:", err)
 		lines := []string{err.Error()}

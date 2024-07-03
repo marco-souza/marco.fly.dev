@@ -12,16 +12,32 @@ tasks:
     desc: Run app in development mode with reload
     watch: true
     sources:
+      - "**/*.sql"
       - "**/*.go"
       - "assets/**/*"
       - "views/**/*"
       - exclude: tmp/**/*
+      - exclude: internal/db/sqlc/**/*
     deps:
       - kill
     cmds:
+      - sqlc generate
       - CGO_ENABLED=1 go build -o ./tmp/{{.BIN_NAME}} cmd/server/main.go
       - ./tmp/{{.BIN_NAME}}
     status: ["false"]
+
+  tests:
+    desc: Run app in development mode with reload
+    watch: true
+    sources:
+      - "tests/**/*"
+      - "**/*_test.go"
+      - "**/*.go"
+      - exclude: tmp/**/*
+      - exclude: internal/db/sqlc/**/*
+    cmds:
+      - sqlc generate
+      - go test -v ./...
 
   kill:
     cmds:

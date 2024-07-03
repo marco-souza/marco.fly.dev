@@ -14,3 +14,6 @@ dist/
 
 # tasks
 .task
+
+# ignore sqlc generated files
+internal/db/sqlc/

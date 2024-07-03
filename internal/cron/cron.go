@@ -4,72 +4,97 @@ package cron
 import (
 	"log"
 
+	"github.com/marco-souza/marco.fly.dev/internal/db"
+	"github.com/marco-souza/marco.fly.dev/internal/db/sqlc"
+	"github.com/marco-souza/marco.fly.dev/internal/lua"
 	"github.com/robfig/cron/v3"
 )
 
-type expressionMap map[int]string
-
-type cronService struct {
-	scheduler             *cron.Cron
-	registeredExpressions expressionMap
-}
+type runningCronJobs map[int]cron.EntryID
 
 type Cron struct {
-	ID         int
-	Expression string
+	sqlc.Cron
+	status string
 }
 
-func new() *cronService {
-	scheduler := cron.New()
-	exprMap := expressionMap{}
+var (
+	scheduler   = cron.New()
+	runningJobs = runningCronJobs{}
+)
 
-	return &cronService{
-		scheduler,
-		exprMap,
-	}
-}
-
-func (c *cronService) Start() {
+func Start() error {
 	log.Println("starting scheduler")
-	c.scheduler.Start()
+	scheduler.Start()
+	return registerPersistedJobs()
 }
 
-func (c *cronService) Stop() {
+func Stop() {
 	log.Println("stopping scheduler")
-	c.scheduler.Stop()
+	scheduler.Stop()
 }
 
-func (c *cronService) Add(cronExpr string, handler func()) error {
-	entryID, err := c.scheduler.AddFunc(cronExpr, handler)
+func AddScript(name, cronExpr, script string) error {
+	job, err := db.Queries.CreateCronJob(db.Ctx, sqlc.CreateCronJobParams{
+		Name:       name,
+		Expression: cronExpr,
+		Script:     script,
+	})
 	if err != nil {
 		return err
 	}
 
-	c.registeredExpressions[int(entryID)] = cronExpr
-	log.Println("cron job created: ", entryID)
+	// register cron job
+	scriptHandler := func() {
+		log.Printf("executing cron job: %s (%e)\n", job.Name, err)
+		if _, err := lua.Run(job.Script); err != nil {
+			log.Printf("error executing cron job: %s (%e)\n", job.Name, err)
+		}
+	}
+
+	// if it was not possible
+	if err := register(int(job.ID), job.Expression, scriptHandler); err != nil {
+		Del(int(job.ID))
+		return err
+	}
+
 	return nil
 }
 
-func (c *cronService) List() []Cron {
-	entries := c.scheduler.Entries()
-
+func List() []Cron {
 	crons := []Cron{}
+
+	entries, err := db.Queries.ListCronJobs(db.Ctx)
+	if err != nil {
+		log.Println("error loading persisted cron jobs: ", err)
+		return crons
+	}
+
 	for _, entry := range entries {
-		a := c.scheduler.Entry(entry.ID)
-		log.Println(a)
+		status := "not running"
+		if _, ok := runningJobs[int(entry.ID)]; ok {
+			status = "running"
+		}
 
 		crons = append(crons, Cron{
-			ID:         int(entry.ID),
-			Expression: c.registeredExpressions[int(entry.ID)],
+			entry,
+			status,
 		})
 	}
 
 	return crons
 }
 
-func (c *cronService) Del(id int) {
-	c.scheduler.Remove(cron.EntryID(id))
-	delete(c.registeredExpressions, id)
-}
+func Del(id int) {
+	// remove from db
+	err := db.Queries.DeleteCronJob(db.Ctx, int64(id))
+	if err != nil {
+		log.Println("error deleting cron job: ", err)
+		return
+	}
 
-var CronService = new()
+	// if its running, stop it
+	if entryID, ok := runningJobs[id]; ok {
+		delete(runningJobs, id)
+		scheduler.Remove(entryID)
+	}
+}

@@ -12,6 +12,7 @@ import (
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
+	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/models"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
@@ -59,7 +60,14 @@ func (s *server) Start() {
 
 	startup := func() error {
 		fmt.Println("starting services...")
-		cron.CronService.Start()
+
+		if err := db.Init(conf.SqliteUrl); err != nil {
+			return err
+		}
+
+		if err := cron.Start(); err != nil {
+			return err
+		}
 
 		if err := discord.DiscordService.Open(); err != nil {
 			return err
@@ -70,9 +78,18 @@ func (s *server) Start() {
 
 	teardown := func() {
 		fmt.Println("shutting down services...")
-		cron.CronService.Stop()
+		db.Close() // TODO: deprecate
+
+		cron.Stop()
 		discord.DiscordService.Close()
-		s.app.Shutdown()
+
+		if err := s.app.Shutdown(); err != nil {
+			log.Fatal(err)
+		}
+
+		if err := db.Close(); err != nil {
+			log.Fatalf("error closing db: %e", err)
+		}
 	}
 
 	// graceful shutdown
