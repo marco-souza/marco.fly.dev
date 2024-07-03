@@ -1,7 +1,6 @@
 package cron_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
@@ -41,11 +40,9 @@ func TestCronJob(t *testing.T) {
 
 	t.Run("can list expression", func(t *testing.T) {
 		crons := cron.List()
-		fmt.Println(crons)
 		assert.Equal(t, len(crons), 2)
 
 		for _, cronEntry := range crons {
-			fmt.Println("{?:}", cronEntry)
 			assert.Greater(t, int(cronEntry.ID), 0)
 			assert.Contains(t, expressions, cronEntry.Expression)
 		}
