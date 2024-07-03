@@ -2,6 +2,7 @@
 package scheduler
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
@@ -15,7 +16,6 @@ func Setup() error {
 	cron.CronService.Start()
 
 	log.Println("loading persisted cron jobs")
-	// load persisted cron jobs
 	crons, err := db.Queries.ListCronJobs(db.Ctx)
 	if err != nil {
 		log.Println("error loading persisted cron jobs: ", err)
@@ -30,20 +30,19 @@ func Setup() error {
 	log.Println("setup persisted cron jobs: ", len(crons))
 	for _, c := range crons {
 		// TODO: running id
-		err := cron.CronService.Add(c.Expression, func() {
-			log.Println("executing cron job: ", c.Name)
+		logPrefix := fmt.Sprintf("cronjob: [%d]: ", c.ID)
+		logger := log.New(log.Writer(), logPrefix, log.Flags())
 
-			output, err := lua.Runtime.Run(c.Script)
-			if err != nil {
-				log.Println("error running lua script: ", err)
-				return
+		cronHandler := func() {
+			logger.Printf("executing cron job: %s\n", c.Name)
+
+			if _, err := lua.Run(c.Script); err != nil {
+				logger.Printf("error executing cron job: %s (%e)\n", c.Name, err)
 			}
+		}
 
-			log.Println("lua script output: ", output)
-		})
-
-		if err != nil {
-			log.Println("error adding cron job: ", err)
+		if err := cron.CronService.Add(c.Expression, cronHandler); err != nil {
+			logger.Printf("error adding cron job: %s (%e)\n", c.Name, err)
 			return err
 		}
 	}

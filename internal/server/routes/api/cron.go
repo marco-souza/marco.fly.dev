@@ -34,7 +34,7 @@ func createCronHandler(c *fiber.Ctx) error {
 
 	fmt.Println("input test: {?:}", input)
 	cron.CronService.Add(input.Cron, func() {
-		lua.Runtime.Run(input.Snippet)
+		lua.Run(input.Snippet)
 	})
 
 	return renderCronList(c)

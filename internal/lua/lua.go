@@ -9,34 +9,24 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 )
 
-type luaRuntime struct {
-	l *lua.State
-}
-
-func pushRuntimeLibraries(l *lua.State) {
-	// add discord to Runtime
-	discord.DiscordService.PushClient(l)
-}
-
-func new() *luaRuntime {
+func Run(snippet string) (string, error) {
+	// setup lua runtime
 	l := lua.NewState()
 
 	lua.OpenLibraries(l)
 	pushRuntimeLibraries(l)
 
-	return &luaRuntime{l}
-}
-
-func (r *luaRuntime) Run(snippet string) (string, error) {
-	log.Println("Running Lua snippet: ", snippet)
-
+	// running lua snippet
 	outputReader, outputWriter, _ := os.Pipe()
 	rescueStdout := os.Stdout // save the actual stdout
-	os.Stdout = outputWriter  //  redirect stdout to pipe
+	// FIXME: this is a shared variable, and if causes some jobs to print using the original stdout
+	//	  instead of pipeing it to the execution output. As we're running concurrently, we'd need
+	//    to lock this resource and execute code snippets sync.
+	os.Stdout = outputWriter //  redirect stdout to pipe
 
-	err := lua.DoString(r.l, snippet)
+	err := lua.DoString(l, snippet)
 	if err != nil {
-		log.Println("Error running Lua snippet", err)
+		log.Println("error running lua snippet: ", err)
 		return "", err
 	}
 
@@ -45,12 +35,14 @@ func (r *luaRuntime) Run(snippet string) (string, error) {
 
 	output, err := io.ReadAll(outputReader)
 	if err != nil {
-		log.Println("Error reading Lua output", err)
+		log.Println("error reading lua output: ", err)
 		return "", err
 	}
 
-	log.Println("Lua output: ", string(output))
 	return string(output), nil
 }
 
-var Runtime = new()
+func pushRuntimeLibraries(l *lua.State) {
+	// add discord to Runtime
+	discord.DiscordService.PushClient(l)
+}
