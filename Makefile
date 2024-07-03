@@ -30,7 +30,7 @@ fmt:
 
 t: test
 test: ./tests/
-	go test -v ./...
+	task tests
 
 encrypt: .env
 	gpg -c .env
