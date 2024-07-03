@@ -11,10 +11,11 @@ import (
 func TestCronJob(t *testing.T) {
 	db.Init("")
 	defer db.Close()
-
+	
 	cron.Start()
 	defer cron.Stop()
-
+	
+	luaScript := "print('hello lua')"
 	expressions := []string{
 		"0 * * * *",
 		"* * * * *",
@@ -22,19 +23,19 @@ func TestCronJob(t *testing.T) {
 
 	t.Run("can add expression", func(t *testing.T) {
 		for _, expr := range expressions {
-			err := cron.AddScript(expr, expr, "print('hello lua')")
+			err := cron.AddScript(expr, expr, luaScript)
 			assert.Nil(t, err)
 		}
 	})
 
 	t.Run("fail if expression is invalid", func(t *testing.T) {
-		err := cron.AddScript("first", "* * * * * *", "print('hello lua')")
+		err := cron.AddScript("first", "* * * * * *", luaScript)
 		assert.Contains(t, err.Error(), "6")
 
-		err = cron.AddScript("second", "invalid", "print('hello lua')")
+		err = cron.AddScript("second", "invalid", luaScript)
 		assert.Contains(t, err.Error(), "invalid")
 
-		err = cron.AddScript("third", "1ms", "print('hello lua')")
+		err = cron.AddScript("third", "1ms", luaScript)
 		assert.Contains(t, err.Error(), "1ms")
 	})
 
