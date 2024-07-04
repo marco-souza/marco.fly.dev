@@ -103,9 +103,14 @@ func registerLocalScripts(scriptFolder string) {
 
 		baseInt := 10000 // offset to avoid conflict with persisted jobs
 		localID := baseInt + fileCounter
-		register(localID, cronExpr, func() {
+
+		if err := register(localID, cronExpr, func() {
 			logger.Printf("executing cron job: %s\n", name)
 			lua.Run(script) // ignore error
-		})
+		}); err != nil {
+			baseInt--
+			logger.Printf("error registering cron job: %s (%e)\n", name, err)
+			continue
+		}
 	}
 }
