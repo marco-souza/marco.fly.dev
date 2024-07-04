@@ -13,9 +13,11 @@ tasks:
     watch: true
     sources:
       - "**/*.sql"
+      - "**/*.lua"
       - "**/*.go"
       - "assets/**/*"
       - "views/**/*"
+      - "taskfile.yml"
       - exclude: tmp/**/*
       - exclude: internal/db/sqlc/**/*
     deps:
