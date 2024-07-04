@@ -1,4 +1,4 @@
---cron: 20 4,16 * * *
+--skip:cron: * * * * *
 
 local channel_map = {
     daily = "742025222126960760",
@@ -18,13 +18,4 @@ local messages = {
     alert_marco = string.format("Hello, <@%s>! Me respeita soooooo celoooko??", user_map.marco)
 }
 
-if not discord.is_work_day() then
-    print("it's weekend! 🏖️🍻")
-    discord.send_message(channel_map.geral, "É fim de semana galera, lembrem de descansar e aproveitar! 🏖️🍻")
-    return
-end
-
-if discord.send_message(channel_map.daily, messages.daily) then
-    -- check if it's not a weekend
-    print("message sent! 🎉")
-end
+discord.send_message(channel_map.testing, messages.alert_marco)

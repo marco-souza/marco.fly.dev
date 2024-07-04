@@ -16,6 +16,7 @@ func menuHandler(c *fiber.Ctx) error {
 	menu := []menuItem{
 		{"/", "Home"},
 		{"/resume", "Resume"},
+		{"/blog", "Blog"},
 		{"/login", "Login"},
 	}
 

@@ -3,6 +3,7 @@ package cron
 
 import (
 	"log"
+	"time"
 
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/db/sqlc"
@@ -18,7 +19,8 @@ type Cron struct {
 }
 
 var (
-	scheduler   = cron.New()
+	br, _       = time.LoadLocation("America/Sao_Paulo")
+	scheduler   = cron.New(cron.WithLocation(br))
 	runningJobs = runningCronJobs{}
 )
 
