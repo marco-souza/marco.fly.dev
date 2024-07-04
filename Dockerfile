@@ -3,6 +3,7 @@ FROM golang:1.22-alpine as base
 WORKDIR /app
 COPY ./views/ ./views/
 COPY ./static/ ./static/
+COPY ./scripts/ ./scripts/
 
 # pre-build stage
 FROM base as pre-build
@@ -16,7 +17,7 @@ COPY . .
 
 # dev stage
 FROM pre-build as dev
-RUN go install github.com/cosmtrek/air@latest
+RUN make install
 CMD ["make", "release"]
 
 # build stage
