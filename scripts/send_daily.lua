@@ -1,4 +1,4 @@
---cron: 20 7,19 * * *
+--cron: 20 4,16 * * *
 
 local channel_map = {
     daily = "742025222126960760",
