@@ -62,6 +62,25 @@ func resumeHandler(c *fiber.Ctx) error {
 	return c.Render("resume", props)
 }
 
+func blogHandler(c *fiber.Ctx) error {
+	log.Println("Building blog page")
+
+	user, _ := github.User("marco-souza", "")
+	pageParams := config.DefaultPageParams
+
+	// set custom title
+	pageParams.Title = fmt.Sprintf("Resume - %s", pageParams.Title)
+
+	props := rootProps{
+		PageParams:  pageParams,
+		PrimaryBtn:  contactURL(),
+		Profile:     *user,
+		Description: processBio(user.Bio),
+	}
+
+	return c.Render("blog", props)
+}
+
 func contactURL() string {
 	q := url.Values{}
 	q.Add("subject", "Hi Marco, Let's have a coffee")
