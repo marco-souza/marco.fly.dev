@@ -75,7 +75,7 @@ func registerLocalScripts(scriptFolder string) {
 	fileCounter := 0
 	for _, f := range localCronJobs {
 		// ignore any file that doesn't end with .lua
-		if f.IsDir() || filepath.Ext(f.Name()) != ".lua" {
+		if f.IsDir() || filepath.Ext(f.Name()) != ".lua" || f.Name()[:1] == "_" {
 			log.Println("ignoring file: ", f.Name())
 			continue
 		}
