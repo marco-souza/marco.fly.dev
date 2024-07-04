@@ -69,7 +69,7 @@ func blogHandler(c *fiber.Ctx) error {
 	pageParams := config.DefaultPageParams
 
 	// set custom title
-	pageParams.Title = fmt.Sprintf("Resume - %s", pageParams.Title)
+	pageParams.Title = fmt.Sprintf("Blog - %s", pageParams.Title)
 
 	props := rootProps{
 		PageParams:  pageParams,
