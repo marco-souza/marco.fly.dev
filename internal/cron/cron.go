@@ -27,7 +27,18 @@ var (
 func Start() error {
 	log.Println("starting scheduler")
 	scheduler.Start()
-	return registerPersistedJobs()
+
+	if err := registerPersistedJobs(); err != nil {
+		scheduler.Stop()
+		return err
+	}
+
+	if err := registerLocalJobs("scripts"); err != nil {
+		scheduler.Stop()
+		return err
+	}
+
+	return nil
 }
 
 func Stop() {

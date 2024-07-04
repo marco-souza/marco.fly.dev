@@ -46,13 +46,10 @@ func registerPersistedJobs() error {
 
 		if err := register(int(c.ID), c.Expression, cronHandler); err != nil {
 			logger.Printf("error adding cron job: %s (%e)\n", c.Name, err)
-			return err
+			continue
 		}
 	}
 	logger.SetPrefix(logPrefix)
-	logger.Println("setup  local cron jobs")
-
-	registerLocalScripts("scripts")
 
 	return nil
 }
@@ -69,13 +66,13 @@ func register(id int, cronExpr string, handler func()) error {
 	return nil
 }
 
-func registerLocalScripts(scriptFolder string) {
+func registerLocalJobs(scriptFolder string) error {
 	logger.Println("loading local cron jobs")
 
 	localCronJobs, err := os.ReadDir(scriptFolder)
 	if err != nil {
 		logger.Println("error loading local cron jobs: ", err)
-		return
+		return err
 	}
 
 	fileCounter := 0
@@ -113,4 +110,6 @@ func registerLocalScripts(scriptFolder string) {
 			continue
 		}
 	}
+
+	return nil
 }
