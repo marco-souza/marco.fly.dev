@@ -19,6 +19,8 @@ local messages = {
 }
 
 if not discord.is_work_day() then
+    print("it's weekend! 🏖️🍻")
+    discord.send_message(channel_map.geral, "É fim de semana galera, lembrem de descansar e aproveitar! 🏖️🍻")
     return
 end
 
