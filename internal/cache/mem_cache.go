@@ -34,7 +34,7 @@ func (c MemCache) Set(key string, value []byte, opts *CacheOptions) error {
 	}
 
 	c.storage[key] = value
-	logger.Printf("cacheed key `%s`\n", key)
+	logger.Printf("cached key `%s`\n", key)
 	return nil
 }
 
