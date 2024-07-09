@@ -14,7 +14,6 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
-	"github.com/marco-souza/marco.fly.dev/internal/models"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
 
@@ -53,10 +52,7 @@ func (s *server) Start() {
 	fmt.Println("setting up routes...")
 	s.setupRoutes()
 
-	if conf.Env == "development" {
-		fmt.Println("seeding db...")
-		models.Seed()
-	}
+	// TODO: seed sqlc db
 
 	startup := func() error {
 		fmt.Println("starting services...")

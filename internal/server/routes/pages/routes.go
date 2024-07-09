@@ -15,7 +15,6 @@ func Apply(router fiber.Router) {
 		Use(middlewares.MustBeLoged).
 		Get("/", dashboardHandler).
 		Get("/playground", playgroundHandler).
-		Get("/orders", ordersHandler).
 		Get("/cronjobs", cronHandler)
 
 	router.Get("/", rootHandler).
