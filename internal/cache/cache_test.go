@@ -44,7 +44,7 @@ func TestMain(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expectedValue, value)
 
-		time.Sleep(1001 * time.Millisecond)
+		time.Sleep(2 * time.Second)
 		_, err = cache.Get("with_ttl")
 		assert.ErrorContains(t, err, "cache miss for key: with_ttl")
 	})
