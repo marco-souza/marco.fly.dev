@@ -15,8 +15,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.9.0
 	github.com/valyala/fasthttp v1.51.0
-	gorm.io/driver/sqlite v1.5.4
-	gorm.io/gorm v1.25.5
 )
 
 require (
@@ -29,8 +27,6 @@ require (
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect

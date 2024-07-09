@@ -24,7 +24,6 @@ func menuHandler(c *fiber.Ctx) error {
 		menu = []menuItem{
 			{"/app/", "Dashboard"},
 			{"/app/playground", "Playground"},
-			{"/app/orders", "Ordero"},
 			{"/app/cronjobs", "Task Scheduler"},
 			{"/logout", "Logout"},
 		}

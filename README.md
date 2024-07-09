@@ -54,7 +54,6 @@ internal
 |- cron        # cron job module
 |- github      # github service
 |- lua         # lua runtime
-|- models      # data models (gorm)
 |- server      # create our backend service
 
 ```

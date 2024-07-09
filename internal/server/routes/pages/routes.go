@@ -8,14 +8,13 @@ import (
 
 func Apply(router fiber.Router) {
 	// add caching
-	router.Use(middlewares.Cache)
+	router.Use(middlewares.DefaultCache)
 
 	// private routes
 	router.Group("/app").
 		Use(middlewares.MustBeLoged).
 		Get("/", dashboardHandler).
 		Get("/playground", playgroundHandler).
-		Get("/orders", ordersHandler).
 		Get("/cronjobs", cronHandler)
 
 	router.Get("/", rootHandler).

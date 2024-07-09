@@ -5,7 +5,6 @@ import (
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/github"
-	"github.com/marco-souza/marco.fly.dev/internal/models"
 )
 
 type Breadcrumb struct {
@@ -46,30 +45,6 @@ func playgroundHandler(c *fiber.Ctx) error {
 	return c.Render("playground", config.DefaultPageParams)
 }
 
-type ordersProps struct {
-	config.PageParams
-	Title  string
-	Total  int64
-	Orders []models.Order
-}
-
-// create user orders
-func ordersHandler(c *fiber.Ctx) error {
-	db := models.Connect()
-	orders := []models.Order{}
-	result := db.Preload("Author").Find(&orders)
-
-	props := ordersProps{
-		PageParams: config.DefaultPageParams,
-		Title:      "All Orders",
-		Orders:     orders,
-		Total:      result.RowsAffected,
-	}
-
-	return c.Render("orders", props)
-}
-
-// create cronjobs
 func cronHandler(c *fiber.Ctx) error {
 	return c.Render("cronjobs", config.DefaultPageParams)
 }

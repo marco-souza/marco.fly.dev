@@ -55,11 +55,6 @@ func Apply(router fiber.Router) {
 		Get("/now", nowHandler).
 		Get("/sse", sseHandler)
 
-	router.Group("/orders").
-		Get("/", ordersHandler).
-		Post("/", createOrderHandler).
-		Delete("/:id", deleteOrderHandler)
-
 	router.Group("/cron").
 		Get("/", cronsHandler).
 		Post("/", createCronHandler).
