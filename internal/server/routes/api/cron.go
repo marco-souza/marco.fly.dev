@@ -20,7 +20,7 @@ func createCronHandler(c *fiber.Ctx) error {
 		return c.SendStatus(400)
 	}
 
-	err := validate.Struct(input)
+	err := input.Validate()
 	if err != nil {
 		fmt.Println("validation error = ", err)
 		return c.SendStatus(400)
