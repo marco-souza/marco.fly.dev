@@ -1,40 +1,15 @@
 package cache
 
-import (
-	"fmt"
-	"log"
-	"time"
+import "log"
+
+var (
+	logger = log.New(log.Writer(), "cache: ", log.Flags())
 )
 
 type CacheStorage interface {
 	Get(key string) ([]byte, error)
-	Set(key string, value []byte) error
-}
-
-type MemCache struct {
-	storage map[string][]byte
-}
-
-var (
-	logger  = log.New(log.Writer(), "cache: ", log.Flags())
-	storage = make(map[string][]byte)
-)
-
-func NewCache() *MemCache {
-	logger.Println("New cache created")
-
-	return &MemCache{
-		storage: storage,
-	}
-}
-
-func (c *MemCache) Get(key string) ([]byte, error) {
-	value, ok := c.storage[key]
-	if !ok {
-		return nil, fmt.Errorf("cache miss for key: %s", key)
-	}
-
-	return value, nil
+	Set(key string, value []byte, opts *CacheOptions) error
+	Flush() error
 }
 
 type CacheOptions struct {
@@ -46,15 +21,26 @@ func WithTTL(ttl int) *CacheOptions {
 	return &CacheOptions{ttl: ttl}
 }
 
-func (c *MemCache) Set(key string, value []byte, opts *CacheOptions) error {
-	if opts != nil && opts.ttl != 0 {
-		go (func() {
-			time.Sleep(time.Duration(opts.ttl) * time.Second)
-			delete(c.storage, key)
-			logger.Printf("key %s has been deleted from cache\n", key)
-		})()
+var storageInstance CacheStorage
+
+func SetStorage(s CacheStorage) error {
+	if storageInstance != nil {
+		return storageInstance.Flush()
 	}
 
-	c.storage[key] = value
+	storageInstance = s
 	return nil
+}
+
+func Get(key string) ([]byte, error) {
+	logger.Printf("getting key %s from cache\n", storageInstance)
+	return storageInstance.Get(key)
+}
+
+func Set(key string, value []byte, opts *CacheOptions) error {
+	return storageInstance.Set(key, value, opts)
+}
+
+func Flush() error {
+	return storageInstance.Flush()
 }
