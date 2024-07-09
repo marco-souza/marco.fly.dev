@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gomarkdown/markdown"
+	"github.com/marco-souza/marco.fly.dev/internal/cache"
 )
 
 type GitHubUser struct {
@@ -87,6 +88,14 @@ func fetch(url, method, token string) ([]byte, error) {
 		url = fmt.Sprintf("%s%s", BASE_API_URL, url)
 	}
 
+	cacheKey := fmt.Sprintf("%s %s", method, url)
+	if cached, err := cache.Get(cacheKey); err != nil {
+		log.Println("Cache miss", cacheKey)
+	} else {
+		log.Println("Cache hit", cacheKey)
+		return cached, nil
+	}
+
 	// make a GET request to the URL
 	client := http.Client{}
 	req, err := http.NewRequest(method, url, nil)
@@ -115,6 +124,9 @@ func fetch(url, method, token string) ([]byte, error) {
 		err := fmt.Errorf("Failed to read body: %v", err)
 		return body, err
 	}
+
+	// cache content by 1 minutes
+	cache.Set(cacheKey, body, cache.WithTTL(60))
 
 	return body, nil
 }
