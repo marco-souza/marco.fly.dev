@@ -1,6 +1,9 @@
 package cache
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 var (
 	logger = log.New(log.Writer(), "cache: ", log.Flags())
@@ -13,12 +16,12 @@ type CacheStorage interface {
 }
 
 type CacheOptions struct {
-	ttl int
+	ttl time.Duration
 }
 
 // interval in seconds, 0 means no ttl
 func WithTTL(ttl int) *CacheOptions {
-	return &CacheOptions{ttl: ttl}
+	return &CacheOptions{time.Duration(ttl) * time.Second}
 }
 
 var storageInstance CacheStorage
@@ -33,7 +36,6 @@ func SetStorage(s CacheStorage) error {
 }
 
 func Get(key string) ([]byte, error) {
-	logger.Printf("getting key %s from cache\n", storageInstance)
 	return storageInstance.Get(key)
 }
 

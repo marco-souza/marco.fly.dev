@@ -27,7 +27,7 @@ func (c MemCache) Get(key string) ([]byte, error) {
 func (c MemCache) Set(key string, value []byte, opts *CacheOptions) error {
 	if opts != nil && opts.ttl != 0 {
 		go (func() {
-			time.Sleep(time.Duration(opts.ttl) * time.Second)
+			time.Sleep(opts.ttl)
 			delete(c.Storage, key)
 			logger.Printf("key %s has been deleted from cache\n", key)
 		})()
