@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 
+	"github.com/marco-souza/marco.fly.dev/internal/cache"
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
@@ -66,6 +67,10 @@ func (s *server) Start() {
 		}
 
 		if err := discord.DiscordService.Open(); err != nil {
+			return err
+		}
+
+		if err := cache.SetStorage(cache.NewMemCache()); err != nil {
 			return err
 		}
 
