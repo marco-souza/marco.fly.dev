@@ -8,7 +8,7 @@ import (
 
 func Apply(router fiber.Router) {
 	// add caching
-	router.Use(middlewares.Cache)
+	router.Use(middlewares.DefaultCache)
 
 	// private routes
 	router.Group("/app").

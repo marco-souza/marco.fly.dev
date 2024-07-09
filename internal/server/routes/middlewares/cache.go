@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"log"
-	"slices"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,23 +10,19 @@ import (
 
 var logger = log.New(log.Writer(), "cache: ", log.Flags())
 
-var Cache = cache.New(cache.Config{
-	Next: func(c *fiber.Ctx) bool {
-		if cacheControl, ok := c.GetReqHeaders()["Cache-Control"]; !ok {
-			if slices.Contains(cacheControl, "no-cache") {
-				logger.Println("disabled by cache control", cacheControl)
-				return false
-			}
-		}
+// cache middleware with 15 minutes expiration
+var DefaultCache = NewCache(15 * time.Minute)
 
-		if c.Query("noCache") == "true" {
-			logger.Println("disabled by query param")
-			return false
-		}
+func NewCache(expiration time.Duration) fiber.Handler {
+	return cache.New(cache.Config{
+		Next:         next,
+		Expiration:   expiration,
+		CacheControl: true,
+	})
+}
 
-		// skip middleware if cache enable
-		return true
-	},
-	Expiration:   15 * time.Minute,
-	CacheControl: true,
-})
+func next(c *fiber.Ctx) bool {
+	isCacheDisabled := c.Query("noCache") == "true"
+	logger.Println("is disabled: ", isCacheDisabled)
+	return isCacheDisabled
+}
