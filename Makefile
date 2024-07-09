@@ -1,5 +1,7 @@
 DB_URL ?= "./test.db"
 
+folder ?= "internal"
+
 all: install run
 
 install:
@@ -39,3 +41,6 @@ encrypt: .env
 
 decrypt: .env.gpg
 	gpg -d .env.gpg > .env
+
+gen:
+	@go run ./cmd/cli/cli.go ${folder} ${name}
