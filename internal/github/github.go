@@ -125,8 +125,8 @@ func fetch(url, method, token string) ([]byte, error) {
 		return body, err
 	}
 
-	// cache content by 1 minute
-	cache.Set(cacheKey, body, cache.WithTTL(60))
+	// cache content by 15 minutes
+	cache.Set(cacheKey, body, cache.WithTTL(15*60))
 
 	return body, nil
 }
