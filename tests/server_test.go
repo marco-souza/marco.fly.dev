@@ -31,17 +31,9 @@ func TestCanCreateServer(t *testing.T) {
 		fmt.Println("server started")
 	})
 
-	// t.Run("can shutdown server", func(t *testing.T) {
-	// 	s.Shutdown()
-	// 	fmt.Println("server is down")
-	// })
-
 	t.Run("can fetch home /", func(t *testing.T) {
 		req := httptest.NewRequest("GET", baseUrl+"/", nil)
 
-		fmt.Printf("req: %v\n", req)
-
-		// http.Response
 		resp, err := s.Test(req, 5000)
 		assert.NoError(t, err)
 		assert.Equal(t, resp.StatusCode, 200)
@@ -49,6 +41,18 @@ func TestCanCreateServer(t *testing.T) {
 		body, err := io.ReadAll(resp.Body)
 		assert.NoError(t, err)
 		assert.Contains(t, string(body), "Marco")
+	})
+
+	t.Run("can fetch home /resume", func(t *testing.T) {
+		req := httptest.NewRequest("GET", baseUrl+"/resume", nil)
+
+		resp, err := s.Test(req, 5000)
+		assert.NoError(t, err)
+		assert.Equal(t, resp.StatusCode, 200)
+
+		body, err := io.ReadAll(resp.Body)
+		assert.NoError(t, err)
+		assert.Contains(t, string(body), "Marco Antônio")
 	})
 
 	t.Run("can shutdown server", func(t *testing.T) {
