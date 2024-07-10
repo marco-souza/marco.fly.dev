@@ -26,7 +26,7 @@ type rootProps struct {
 }
 
 func notFoundHandler(c *fiber.Ctx) error {
-	logger.Info("Page not found")
+	logger.Info("page not found")
 	return c.
 		Status(http.StatusNotFound).
 		Render("404", config.DefaultPageParams)
@@ -46,7 +46,7 @@ func rootHandler(c *fiber.Ctx) error {
 }
 
 func resumeHandler(c *fiber.Ctx) error {
-	logger.Info("Building resume page")
+	logger.Info("building resume page")
 
 	user, _ := github.User("marco-souza", "")
 	pageParams := config.DefaultPageParams
@@ -65,7 +65,7 @@ func resumeHandler(c *fiber.Ctx) error {
 }
 
 func blogHandler(c *fiber.Ctx) error {
-	logger.Info("Building blog page")
+	logger.Info("building blog page")
 
 	user, _ := github.User("marco-souza", "")
 	pageParams := config.DefaultPageParams
@@ -92,7 +92,7 @@ func contactURL() string {
 		q.Encode(), "+", "%20",
 	)
 
-	logger.Info("Contact Link generated", "contact", contact)
+	logger.Info("contact Link generated", "contact", contact)
 
 	return contact
 }
