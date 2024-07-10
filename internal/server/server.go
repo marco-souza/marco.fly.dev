@@ -25,14 +25,13 @@ type server struct {
 	app      *fiber.App
 }
 
-var conf = config.Load()
-
 func New() *server {
+	conf := config.Load()
 	hostname := conf.Hostname
 	port := conf.Port
 	addr := hostname + ":" + port
 
-	engine := html.New("../views", ".html")
+	engine := html.New(conf.Views, ".html")
 	if conf.Env == "development" {
 		engine.Debug(true)
 		engine.Reload(true)
@@ -58,7 +57,7 @@ func (s *server) Start(done *chan bool) {
 	startup := func() error {
 		log.Println("starting server dependencies")
 
-		if err := db.Init(conf.SqliteUrl); err != nil {
+		if err := db.Init(config.Load().SqliteUrl); err != nil {
 			return err
 		}
 
