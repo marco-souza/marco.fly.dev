@@ -9,35 +9,83 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/server"
 )
 
-func BenchmarkProdServer(b *testing.B) {
-	baseUrl := "https://marco.fly.dev"
-
-	b.ResetTimer() // Reset the benchmark timer
-
-	b.Run("sync GET /", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			http.Get(baseUrl + "/")
-		}
-	})
-
-	b.Run("async GET /", func(b *testing.B) {
-		b.RunParallel(func(pb *testing.PB) {
-			for pb.Next() {
-				http.Get(baseUrl + "/")
-			}
-		})
-	})
+var routes = []string{
+	"/",
+	"/resume",
+	"/blog",
+	"/login",
 }
 
-func BenchmarkLocalServer(b *testing.B) {
-	baseUrl := "http://localhost:3001"
+func BenchmarkProdServerSync(b *testing.B) {
+	for _, route := range routes {
+		b.Run(route, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				fetchProdPage(route)
+			}
+		})
+	}
+}
 
+func BenchmarkProdServerParallel(b *testing.B) {
+	for _, route := range routes {
+		b.Run(route, func(b *testing.B) {
+			b.RunParallel(func(pb *testing.PB) {
+				for pb.Next() {
+					fetchProdPage(route)
+				}
+			})
+		})
+	}
+}
+
+func BenchmarkLocalServerSync(b *testing.B) {
+	teardown := localServerSetup(b)
+	defer teardown()
+
+	for _, route := range routes {
+		b.Run(route, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				fetchLocalPage(route)
+			}
+		})
+	}
+}
+
+func BenchmarkLocalServerParallel(b *testing.B) {
+	teardown := localServerSetup(b)
+	defer teardown()
+
+	for _, route := range routes {
+		b.Run(route, func(b *testing.B) {
+			b.RunParallel(func(pb *testing.PB) {
+				for pb.Next() {
+					fetchLocalPage(route)
+				}
+			})
+		})
+	}
+}
+
+func fetchProdPage(route string) {
+	baseUrl := "https://marco.fly.dev"
+	http.Get(baseUrl + route)
+}
+
+func fetchLocalPage(route string) {
+	baseUrl := "http://localhost:3001"
+	http.Get(baseUrl + route)
+}
+
+func localServerSetup(b *testing.B) func() {
 	// set view folder
 	b.Setenv("VIEWS", "../../views/")
 
 	// disabling logs
-	log.SetFlags(0)
-	log.SetOutput(io.Discard)
+	l := 1
+	if &l == nil {
+		log.SetFlags(0)
+		log.SetOutput(io.Discard)
+	}
 
 	done := make(chan bool)
 	s := server.New()
@@ -45,19 +93,10 @@ func BenchmarkLocalServer(b *testing.B) {
 	go s.Start(&done)
 	<-done
 
-	b.ResetTimer() // Reset the benchmark timer
+	fetchLocalPage("/") // warm up
 
-	b.Run("sync GET /", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			http.Get(baseUrl + "/")
-		}
-	})
+	// Reset the benchmark timer
+	b.ResetTimer()
 
-	b.Run("async GET /", func(b *testing.B) {
-		b.RunParallel(func(pb *testing.PB) {
-			for pb.Next() {
-				http.Get(baseUrl + "/")
-			}
-		})
-	})
+	return s.Shutdown
 }
