@@ -1,7 +1,7 @@
 package server
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,6 +17,8 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
+
+var logger = slog.With("service", "server")
 
 type server struct {
 	addr     string
@@ -49,28 +51,28 @@ func New() *server {
 }
 
 func (s *server) Start(done *chan bool) {
-	log.Println("setting up routes")
+	logger.Info("setting up routes")
 	s.setupRoutes()
 
 	// TODO: seed sqlc db
 
 	startup := func() error {
-		log.Println("starting server dependencies")
+		logger.Info("starting server dependencies")
 
 		if err := db.Init(config.Load().SqliteUrl); err != nil {
 			return err
 		}
 
 		if err := cron.Start(); err != nil {
-			log.Println("[warn] failed to start cron:", err)
+			logger.Warn("failed to start cron", "err", err)
 		}
 
 		if err := discord.DiscordService.Open(); err != nil {
-			log.Println("[warn] failed to start discord:", err)
+			logger.Warn("failed to start discord", "err", err)
 		}
 
 		if err := cache.SetStorage(cache.NewMemCache()); err != nil {
-			log.Println("[warn] failed to start cache:", err)
+			logger.Warn("failed to start cache", "err", err)
 		}
 
 		// listen for server events
@@ -82,7 +84,8 @@ func (s *server) Start(done *chan bool) {
 			if listenData.TLS {
 				scheme = "https"
 			}
-			log.Println("listening on: ", scheme+"://"+listenData.Host+":"+listenData.Port)
+			url := scheme + "://" + listenData.Host + ":" + listenData.Port
+			logger.Info("listening on " + url)
 
 			if done != nil {
 				*done <- true
@@ -105,12 +108,12 @@ func (s *server) Start(done *chan bool) {
 	// await for server to shutdown
 	if err := startup(); err != nil {
 		s.Shutdown()
-		log.Fatal(err)
+		logger.Error("server failed", "err", err)
 	}
 }
 
 func (s *server) setupRoutes() {
-	log.Println("setup static resources")
+	logger.Info("setup static resources")
 	s.app.Static("/static", "./static", fiber.Static{
 		Compress:      true,
 		ByteRange:     true,
@@ -123,20 +126,20 @@ func (s *server) setupRoutes() {
 }
 
 func (s *server) Shutdown() {
-	log.Println("shutting down server dependencies")
+	logger.Info("shutting down server dependencies")
 
 	cron.Stop()
 	discord.DiscordService.Close()
 
 	if err := s.app.Shutdown(); err != nil {
-		log.Println("failed to shutdown server", err)
+		logger.Warn("failed to shutdown server", "err", err)
 	}
 
 	if err := db.Close(); err != nil {
-		log.Println("failed to shutdown db", err)
+		logger.Warn("failed to shutdown db", "err", err)
 	}
 
-	log.Println("bye bye!")
+	logger.Info("bye!")
 }
 
 func (s *server) Test(req *http.Request, timeout ...int) (*http.Response, error) {

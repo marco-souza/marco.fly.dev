@@ -1,13 +1,11 @@
 package cache
 
 import (
-	"log"
+	"log/slog"
 	"time"
 )
 
-var (
-	logger = log.New(log.Writer(), "cache: ", log.Flags())
-)
+var logger = slog.With("service", "cache")
 
 type CacheStorage interface {
 	Get(key string) ([]byte, error)

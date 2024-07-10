@@ -1,13 +1,12 @@
 package discord
 
 import (
-	"log"
-	"os"
+	"log/slog"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-var logger = log.New(os.Stdout, "discord: ", log.LstdFlags)
+var logger = slog.With("discord")
 
 type discordService struct {
 	session *discordgo.Session
@@ -25,11 +24,11 @@ func new() *discordService {
 func (d *discordService) SendMessage(channel, message string) error {
 	_, err := d.session.ChannelMessageSend(channel, message)
 	if err != nil {
-		logger.Printf("error sending message: %v", err)
+		logger.Error("error sending message", "err", err)
 		return err
 	}
 
-	logger.Printf("message sent: '%s'", message)
+	logger.Info("message sent", "message", message)
 	return nil
 }
 

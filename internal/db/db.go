@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
-	"log"
+	"log/slog"
 
 	"github.com/marco-souza/marco.fly.dev/internal/db/sqlc"
 
@@ -15,13 +15,14 @@ var (
 	Ctx     context.Context = context.Background()
 	client  *sql.DB
 	Queries *sqlc.Queries
+	logger  = slog.With("service", "db")
 )
 
 //go:embed schema.sql
 var ddl string
 
 func Init(file string) error {
-	log.Println("init db")
+	logger.Info("init db")
 
 	if file == "" {
 		file = ":memory:"
@@ -37,7 +38,7 @@ func Init(file string) error {
 
 	// setup the database schema
 	if _, err := db.ExecContext(Ctx, ddl); err != nil {
-		log.Println("error configuring db tables: ", err)
+		logger.Error("error configuring db tables", "err", err)
 	}
 
 	Queries = sqlc.New(db)
@@ -45,7 +46,7 @@ func Init(file string) error {
 }
 
 func Close() error {
-	log.Println("closing db")
+	logger.Info("closing db")
 
 	Ctx = nil
 	Queries = nil

@@ -2,7 +2,7 @@ package lua
 
 import (
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"sync"
 
@@ -10,7 +10,10 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 )
 
-var stdoutLock = &sync.Mutex{}
+var (
+	stdoutLock = &sync.Mutex{}
+	logger     = slog.With("lua:")
+)
 
 func Run(snippet string) (string, error) {
 	// setup lua runtime
@@ -29,7 +32,7 @@ func Run(snippet string) (string, error) {
 
 	err := lua.DoString(l, snippet)
 	if err != nil {
-		log.Println("error running lua snippet: ", err)
+		logger.Error("error running lua snippet", "err", err)
 		return "", err
 	}
 
@@ -38,7 +41,7 @@ func Run(snippet string) (string, error) {
 
 	output, err := io.ReadAll(outputReader)
 	if err != nil {
-		log.Println("error reading lua output: ", err)
+		logger.Error("error reading lua output", "err", err)
 		return "", err
 	}
 
