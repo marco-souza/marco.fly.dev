@@ -1,8 +1,8 @@
 package server
 
 import (
-	"fmt"
-	"log"
+	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -18,6 +18,8 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 )
 
+var logger = slog.With("service", "server")
+
 type server struct {
 	addr     string
 	hostname string
@@ -25,14 +27,13 @@ type server struct {
 	app      *fiber.App
 }
 
-var conf = config.Load()
-
 func New() *server {
+	conf := config.Load()
 	hostname := conf.Hostname
 	port := conf.Port
-	addr := fmt.Sprintf("%s:%s", hostname, port)
+	addr := hostname + ":" + port
 
-	engine := html.New("./views", ".html")
+	engine := html.New(conf.Views, ".html")
 	if conf.Env == "development" {
 		engine.Debug(true)
 		engine.Reload(true)
@@ -49,67 +50,70 @@ func New() *server {
 	}
 }
 
-func (s *server) Start() {
-	fmt.Println("setting up routes...")
+func (s *server) Start(done *chan bool) {
+	logger.Info("setting up routes")
 	s.setupRoutes()
 
 	// TODO: seed sqlc db
 
 	startup := func() error {
-		fmt.Println("starting services...")
+		logger.Info("starting server dependencies")
 
-		if err := db.Init(conf.SqliteUrl); err != nil {
+		if err := db.Init(config.Load().SqliteUrl); err != nil {
 			return err
 		}
 
 		if err := cron.Start(); err != nil {
-			return err
+			logger.Warn("failed to start cron", "err", err)
 		}
 
 		if err := discord.DiscordService.Open(); err != nil {
-			return err
+			logger.Warn("failed to start discord", "err", err)
 		}
 
 		if err := cache.SetStorage(cache.NewMemCache()); err != nil {
-			return err
+			logger.Warn("failed to start cache", "err", err)
 		}
+
+		// listen for server events
+		s.app.Hooks().OnListen(func(listenData fiber.ListenData) error {
+			if fiber.IsChild() {
+				return nil
+			}
+			scheme := "http"
+			if listenData.TLS {
+				scheme = "https"
+			}
+			url := scheme + "://" + listenData.Host + ":" + listenData.Port
+			logger.Info("listening on " + url)
+
+			if done != nil {
+				*done <- true
+			}
+
+			return nil
+		})
 
 		return s.app.Listen(s.addr)
 	}
 
-	teardown := func() {
-		fmt.Println("shutting down services...")
-		db.Close() // TODO: deprecate
-
-		cron.Stop()
-		discord.DiscordService.Close()
-
-		if err := s.app.Shutdown(); err != nil {
-			log.Fatal(err)
-		}
-
-		if err := db.Close(); err != nil {
-			log.Fatalf("error closing db: %e", err)
-		}
-	}
-
-	// graceful shutdown
+	// graceful shutdown on interrupt signal
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
 	go func() {
 		<-shutdown // wait for shutdown signal
-		teardown()
+		s.Shutdown()
 	}()
 
 	// await for server to shutdown
 	if err := startup(); err != nil {
-		teardown()
-		log.Fatal(err)
+		s.Shutdown()
+		logger.Error("server failed", "err", err)
 	}
 }
 
 func (s *server) setupRoutes() {
-	log.Println("setup static resources")
+	logger.Info("setup static resources")
 	s.app.Static("/static", "./static", fiber.Static{
 		Compress:      true,
 		ByteRange:     true,
@@ -119,4 +123,25 @@ func (s *server) setupRoutes() {
 	})
 
 	routes.SetupRoutes(s.app)
+}
+
+func (s *server) Shutdown() {
+	logger.Info("shutting down server dependencies")
+
+	cron.Stop()
+	discord.DiscordService.Close()
+
+	if err := s.app.Shutdown(); err != nil {
+		logger.Warn("failed to shutdown server", "err", err)
+	}
+
+	if err := db.Close(); err != nil {
+		logger.Warn("failed to shutdown db", "err", err)
+	}
+
+	logger.Info("bye!")
+}
+
+func (s *server) Test(req *http.Request, timeout ...int) (*http.Response, error) {
+	return s.app.Test(req, timeout...)
 }

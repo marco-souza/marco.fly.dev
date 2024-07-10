@@ -17,21 +17,21 @@ func sseHandler(c *fiber.Ctx) error {
 	c.Set("Transfer-Encoding", "chunked")
 
 	c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-		fmt.Println("WRITER")
+		logger.Info("WRITER")
 		var i int
 		for {
 			i++
 			msg := fmt.Sprintf("%d - the time is %v", i, time.Now())
 			fmt.Fprintf(w, "data: Message: %s\n\n", msg)
-			fmt.Println(msg)
+
+			logger.Info(msg)
 
 			err := w.Flush()
 			if err != nil {
 				// Refreshing page in web browser will establish a new
 				// SSE connection, but only (the last) one is alive, so
 				// dead connections must be closed here.
-				fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
-
+				logger.Error("error while flushing, closing http connection", "err", err)
 				break
 			}
 			time.Sleep(2 * time.Second)
@@ -50,10 +50,10 @@ func sseReloadHandler(c *fiber.Ctx) error {
 	c.Set("Transfer-Encoding", "chunked")
 
 	c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-		fmt.Println("connection created")
+		logger.Info("connection created")
 		for {
 			if shouldReload {
-				fmt.Println("reload: ", shouldReload)
+				logger.Info("reload", "shouldReload", shouldReload)
 
 				// send message if should reload
 				msg := fmt.Sprintf("reload")
@@ -66,7 +66,7 @@ func sseReloadHandler(c *fiber.Ctx) error {
 				// Refreshing page in web browser will establish a new
 				// SSE connection, but only (the last) one is alive, so
 				// dead connections must be closed here.
-				fmt.Printf("Error while flushing: %v. Closing http connection.\n", err)
+				logger.Info("Error while flushing, closing http connection", "err", err)
 				break
 			}
 			time.Sleep(time.Millisecond * 10)

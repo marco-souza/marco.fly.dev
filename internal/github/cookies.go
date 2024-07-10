@@ -1,7 +1,6 @@
 package github
 
 import (
-	"log"
 	"strings"
 	"time"
 
@@ -50,7 +49,7 @@ func (c *AuthCookies) setCookie(name, token string, expires int) {
 		Secure:      strings.HasPrefix(c.Protocol(), "https"),
 	}
 
-	log.Print("set cookie: ", name, cookie)
+	logger.Info("set cookie: ", "name", name, "cookie", cookie)
 
 	c.Cookie(cookie)
 }

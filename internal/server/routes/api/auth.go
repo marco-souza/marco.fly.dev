@@ -1,7 +1,7 @@
 package api
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -16,7 +16,8 @@ var (
 			"ma.souza.junior@gmail.com": true,
 		},
 	}
-	cfg = config.Load()
+	logger = slog.With("service", "api")
+	cfg    = config.Load()
 )
 
 func redirectGithubAuth(c *fiber.Ctx) error {
@@ -39,11 +40,11 @@ func callbackGithubAuth(c *fiber.Ctx) error {
 
 	// check if the user is allowed
 	if !auth.IsUserAllowed(authToken.AccessToken) {
-		log.Println("user is not allowed")
+		logger.Warn("user is not allowed")
 		return c.Redirect(cfg.Github.LoginPage+"?error=unauthorized", fiber.StatusTemporaryRedirect)
 	}
 
-	log.Print("settings auth cookies")
+	logger.Info("settings auth cookies")
 	cookies.SetAuthCookies(authToken)
 
 	return c.Redirect(cfg.Github.DashboardPage, fiber.StatusTemporaryRedirect)
@@ -56,7 +57,7 @@ func logoutGithubAuth(c *fiber.Ctx) error {
 		RefreshTokenKey: constants.REFRESH_TOKEN_KEY,
 	}
 
-	log.Println("logging out")
+	logger.Info("sign out")
 	cookies.DeleteAuthCookies()
 
 	return c.Redirect("/", fiber.StatusTemporaryRedirect)

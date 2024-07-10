@@ -29,12 +29,13 @@ func (c MemCache) Set(key string, value []byte, opts *CacheOptions) error {
 		go (func() {
 			time.Sleep(opts.ttl)
 			delete(c.storage, key)
-			logger.Printf("key `%s` has been deleted\n", key)
+			logger.Info("key has been deleted", "key", key)
 		})()
 	}
 
 	c.storage[key] = value
-	logger.Printf("cached key `%s`\n", key)
+	logger.Info("cached key", "key", key)
+
 	return nil
 }
 

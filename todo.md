@@ -6,10 +6,14 @@
 
 ## Backlog
 
-    - [ ] create allowed email to sign-in
-    - [ ] improve security
-    - [ ] push on tests
-    - [ ] add benchmark
+    - [X] create allowed email to sign-in
+    - [X] improve security
+    - [X] push on tests
+    - [X] add benchmark
+    - [X] improve logging
+    - [ ] improve UI error handling
+    - [ ] edit cron jobs #16
+    - [ ] integrate with telegram
 
 ## Done
 

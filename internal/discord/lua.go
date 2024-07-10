@@ -10,26 +10,27 @@ func sendMsgWrapper(s *lua.State) int {
 	// get channel from lua
 	channel, ok := s.ToString(1) // {channel, message}
 	if !ok {
-		logger.Println("failed to get channel", channel)
+		logger.Error("failed to get channel", "channel", channel)
 		return 0
 	}
 
 	// get message from lua
 	message, ok := s.ToString(2) // {channel, message}
 	if !ok {
-		logger.Println("failed to get message", message)
+		logger.Error("failed to get message", "message", message)
 		s.PushBoolean(false) // {false, channel, message}
 		return 1             // number of results
 	}
 
-	logger.Printf("sending message to channel: (%s) %s", channel, message)
+	logger.Info("sending message to channel", "channel", channel, "message", message)
+
 	if err := DiscordService.SendMessage(channel, message); err != nil {
-		logger.Printf("failed to send message: (%s) %s", channel, message)
+		logger.Info("failed to send message", "channel", channel, "message", message)
 		s.PushBoolean(false) // {false, channel, message}
 		return 1             // number of results
 	}
 
-	logger.Println("message sent!")
+	logger.Info("message sent", "channel", channel, "message", message)
 	s.PushBoolean(true) // {true, channel, message}
 	return 1            // number of results
 }
@@ -38,7 +39,7 @@ func isWorkDay(l *lua.State) int {
 	weekend := []time.Weekday{time.Saturday, time.Sunday}
 	weekDay := time.Now().Weekday()
 
-	logger.Printf("checking if %s is a work day: %v", weekDay, weekend)
+	logger.Info("checking if today is a work day", "weekDay", weekDay, "weekend", weekend)
 
 	for _, day := range weekend {
 		if day == weekDay {

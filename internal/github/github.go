@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/gomarkdown/markdown"
@@ -24,11 +23,11 @@ func User(username, token string) (*GitHubUser, error) {
 		url = fmt.Sprintf("/users/%s", username)
 	}
 
-	log.Println("Loading profile", url)
+	logger.Info("loading profile")
 
 	body, err := fetch(url, "GET", token)
 	if err != nil {
-		log.Println("Error fetching profile", err)
+		logger.Error("error fetching profile", "username", username, "err", err)
 		return nil, err
 	}
 
@@ -36,7 +35,7 @@ func User(username, token string) (*GitHubUser, error) {
 	var user GitHubUser
 	err = json.Unmarshal(body, &user)
 	if err != nil {
-		log.Printf("Failed to unmarshal body: %v", err)
+		logger.Error("Failed to unmarshal body", "err", err)
 		return nil, err
 	}
 
@@ -51,7 +50,7 @@ type GithubEmail struct {
 
 func Emails(token string) ([]GithubEmail, error) {
 	url := "/user/emails"
-	log.Println("listing emails", url)
+	logger.Info("listing emails", "url", url, "token", token)
 
 	body, err := fetch(url, "GET", token)
 	if err != nil {
@@ -62,7 +61,7 @@ func Emails(token string) ([]GithubEmail, error) {
 	var emails []GithubEmail
 	err = json.Unmarshal(body, &emails)
 	if err != nil {
-		log.Printf("Failed to unmarshal body: %v", err)
+		logger.Error("Failed to unmarshal body", "err", err)
 		return nil, err
 	}
 
@@ -70,11 +69,11 @@ func Emails(token string) ([]GithubEmail, error) {
 }
 
 func Resume(url string) ([]byte, error) {
-	log.Println("fetching resume", url)
+	logger.Info("fetching resume", "url", url)
 
 	body, err := fetch(url, "GET", "")
 	if err != nil {
-		log.Println("Error fetching resume", err)
+		logger.Error("Error fetching resume", "err", err)
 		return nil, err
 	}
 
@@ -90,9 +89,9 @@ func fetch(url, method, token string) ([]byte, error) {
 
 	cacheKey := fmt.Sprintf("%s %s", method, url)
 	if cached, err := cache.Get(cacheKey); err != nil {
-		log.Println("Cache miss", cacheKey)
+		logger.Info("miss", "key", cacheKey)
 	} else {
-		log.Println("Cache hit", cacheKey)
+		logger.Info("hit", "key", cacheKey)
 		return cached, nil
 	}
 

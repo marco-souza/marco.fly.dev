@@ -3,7 +3,7 @@ package pages
 import (
 	"fmt"
 	"html/template"
-	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -15,6 +15,8 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/github"
 )
 
+var logger = slog.With("service", "pages")
+
 type rootProps struct {
 	config.PageParams
 	PrimaryBtn   string
@@ -24,7 +26,7 @@ type rootProps struct {
 }
 
 func notFoundHandler(c *fiber.Ctx) error {
-	log.Println("Page not found")
+	logger.Info("page not found")
 	return c.
 		Status(http.StatusNotFound).
 		Render("404", config.DefaultPageParams)
@@ -44,7 +46,7 @@ func rootHandler(c *fiber.Ctx) error {
 }
 
 func resumeHandler(c *fiber.Ctx) error {
-	log.Println("Building resume page")
+	logger.Info("building resume page")
 
 	user, _ := github.User("marco-souza", "")
 	pageParams := config.DefaultPageParams
@@ -63,7 +65,7 @@ func resumeHandler(c *fiber.Ctx) error {
 }
 
 func blogHandler(c *fiber.Ctx) error {
-	log.Println("Building blog page")
+	logger.Info("building blog page")
 
 	user, _ := github.User("marco-souza", "")
 	pageParams := config.DefaultPageParams
@@ -90,7 +92,7 @@ func contactURL() string {
 		q.Encode(), "+", "%20",
 	)
 
-	log.Println("Contact Link generated", contact)
+	logger.Info("contact Link generated", "contact", contact)
 
 	return contact
 }
@@ -110,7 +112,6 @@ func processBio(text string) template.HTML {
 
 	result := tagRegex.ReplaceAllStringFunc(text, func(tag string) string {
 		name := strings.TrimPrefix(tag, "@")
-		log.Print(text, tag, name)
 		link, ok := linkMap[name]
 		if ok {
 			return fmt.Sprintf(

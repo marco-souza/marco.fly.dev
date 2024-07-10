@@ -1,27 +1,17 @@
 package api
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/storage/sqlite3/v2"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
-	"github.com/marco-souza/marco.fly.dev/internal/github"
+	"github.com/marco-souza/marco.fly.dev/internal/server/routes/middlewares"
 )
 
-var conf = config.Load()
-
-// create auth check middleware
-func authMiddleware(c *fiber.Ctx) error {
-	token := github.AccessToken(c)
-	if token == "" {
-		log.Println("Unauthorized access, redirecting to login page.")
-		return c.Redirect(conf.Github.LoginPage)
-	}
-	return c.Next()
-}
+var (
+	conf = config.Load()
+)
 
 func Apply(router fiber.Router) {
 	// https://docs.gofiber.io/api/middleware/limiter
@@ -48,7 +38,7 @@ func Apply(router fiber.Router) {
 	}
 
 	// private routes
-	router.Use(authMiddleware)
+	router.Use(middlewares.MustHaveToken)
 
 	router.Group("/").
 		Post("/lua", luaHandler).

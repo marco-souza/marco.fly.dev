@@ -2,8 +2,6 @@
 package cron
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,44 +10,38 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/lua"
 )
 
-var (
-	logPrefix = "cronjob: [main]: "
-	logger    = log.New(log.Writer(), logPrefix, log.Flags())
-)
-
 // Setup scheduler by initializing cronjobs, registering lua scripts persisted
 func registerPersistedJobs() error {
-	logger.Println("loading persisted cron jobs")
+	logger.Info("loading persisted cron jobs")
 	crons, err := db.Queries.ListCronJobs(db.Ctx)
 	if err != nil {
-		logger.Println("error loading persisted cron jobs: ", err)
+		logger.Error("error loading persisted cron jobs", "err", err)
 		return err
 	}
 
 	if len(crons) == 0 {
-		logger.Println("no job found")
+		logger.Info("no job found")
 		return nil
 	}
 
-	logger.Println("setup persisted cron jobs: ", len(crons))
+	logger.Info("setup persisted cron jobs: ", "length", len(crons))
+
 	for _, c := range crons {
-		jobPrefix := fmt.Sprintf("cronjob: [%d]: ", c.ID)
-		logger.SetPrefix(jobPrefix)
+		logger := logger.With("id", c.ID)
 
 		cronHandler := func() {
-			logger.Printf("executing cron job: %s\n", c.Name)
+			logger.Info("executing cron job", "name", c.Name)
 
 			if _, err := lua.Run(c.Script); err != nil {
-				logger.Printf("error executing cron job: %s (%e)\n", c.Name, err)
+				logger.Error("error executing cron job", "name", c.Name, "err", err)
 			}
 		}
 
 		if err := register(int(c.ID), c.Expression, cronHandler); err != nil {
-			logger.Printf("error adding cron job: %s (%e)\n", c.Name, err)
+			logger.Warn("error adding cron job", "name", c.Name, "err", err)
 			continue
 		}
 	}
-	logger.SetPrefix(logPrefix)
 
 	return nil
 }
@@ -61,17 +53,16 @@ func register(id int, cronExpr string, handler func()) error {
 	}
 
 	runningJobs[id] = entryID
-	logger.Println("cron job registered: ", entryID)
+	logger.Info("cron job registered", "id", entryID)
 
 	return nil
 }
 
 func registerLocalJobs(scriptFolder string) error {
-	logger.Println("loading local cron jobs")
+	logger.Info("loading local cron jobs")
 
 	localCronJobs, err := os.ReadDir(scriptFolder)
 	if err != nil {
-		logger.Println("error loading local cron jobs: ", err)
 		return err
 	}
 
@@ -79,14 +70,14 @@ func registerLocalJobs(scriptFolder string) error {
 	for _, f := range localCronJobs {
 		// ignore any file that doesn't end with .lua
 		if f.IsDir() || filepath.Ext(f.Name()) != ".lua" || f.Name()[:1] == "_" {
-			logger.Println("ignoring file: ", f.Name())
+			logger.Debug("ignoring file", "name", f.Name())
 			continue
 		}
 
 		name := f.Name()
 		rawFile, err := os.ReadFile(filepath.Join(scriptFolder, name))
 		if err != nil {
-			logger.Printf("error reading cron job: %s (%e)\n", name, err)
+			logger.Warn("error reading cron job", "name", name, "err", err)
 			continue
 		}
 
@@ -96,17 +87,17 @@ func registerLocalJobs(scriptFolder string) error {
 		cronExpr := strings.TrimSpace(firstLine)[len("--cron: "):] // ignore '--cron: '
 
 		fileCounter++
-		logger.Printf("registering cronjob: cron:%s name:%s", cronExpr, name)
+		logger.Info("registering cronjob", "expression", cronExpr, "name", name)
 
 		baseInt := 10000 // offset to avoid conflict with persisted jobs
 		localID := baseInt + fileCounter
 
 		if err := register(localID, cronExpr, func() {
-			logger.Printf("executing cron job: %s\n", name)
+			logger.Info("executing cron job", "name", name)
 			lua.Run(script) // ignore error
 		}); err != nil {
 			baseInt--
-			logger.Printf("error registering cron job: %s (%e)\n", name, err)
+			logger.Warn("error registering cron job", "name", name, "err", err)
 			continue
 		}
 	}

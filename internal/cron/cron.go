@@ -2,7 +2,7 @@
 package cron
 
 import (
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/marco-souza/marco.fly.dev/internal/db"
@@ -22,10 +22,11 @@ var (
 	br, _       = time.LoadLocation("America/Sao_Paulo")
 	scheduler   = cron.New(cron.WithLocation(br))
 	runningJobs = runningCronJobs{}
+	logger      = slog.With("service", "cron")
 )
 
 func Start() error {
-	log.Println("starting scheduler")
+	logger.Info("starting scheduler")
 	scheduler.Start()
 
 	if err := registerPersistedJobs(); err != nil {
@@ -42,7 +43,7 @@ func Start() error {
 }
 
 func Stop() {
-	log.Println("stopping scheduler")
+	logger.Info("stopping scheduler")
 	scheduler.Stop()
 }
 
@@ -58,9 +59,10 @@ func AddScript(name, cronExpr, script string) error {
 
 	// register cron job
 	scriptHandler := func() {
-		log.Printf("executing cron job: %s (%e)\n", job.Name, err)
+		logger.Info("executing cron job", "name", job.Name)
+
 		if _, err := lua.Run(job.Script); err != nil {
-			log.Printf("error executing cron job: %s (%e)\n", job.Name, err)
+			logger.Error("error executing cron job", "name", job.Name, "err", err)
 		}
 	}
 
@@ -78,7 +80,7 @@ func List() []Cron {
 
 	entries, err := db.Queries.ListCronJobs(db.Ctx)
 	if err != nil {
-		log.Println("error loading persisted cron jobs: ", err)
+		logger.Warn("error loading persisted cron jobs", "err", err)
 		return crons
 	}
 
@@ -101,7 +103,7 @@ func Del(id int) {
 	// remove from db
 	err := db.Queries.DeleteCronJob(db.Ctx, int64(id))
 	if err != nil {
-		log.Println("error deleting cron job: ", err)
+		logger.Warn("error deleting cron job", "err", err)
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"net/url"
@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	logger           = slog.With("service", "github")
 	authUrl          = "https://github.com/login/oauth"
 	contentType      = "application/json"
 	cfg              = config.Load()
@@ -56,16 +57,16 @@ type AuthToken struct {
 func (a *Auth) IsUserAllowed(token string) bool {
 	emails, err := Emails(token)
 	if err != nil {
-		log.Println("failed to fetch emails", err)
+		logger.Error("failed to fetch emails", "err", err)
 		return false
 	}
 
-	log.Printf("emails: %v, allowed: %v", emails, a.AllowedEmails)
+	logger.Info("checking user emails", "emails", emails, "allowed", a.AllowedEmails)
 
 	for _, email := range emails {
 		isValid, ok := a.AllowedEmails[email.Email]
 		if !ok {
-			log.Println("email is not allowed, checking next")
+			logger.Warn("email is not allowed, checking next")
 			continue
 		}
 
@@ -74,7 +75,7 @@ func (a *Auth) IsUserAllowed(token string) bool {
 		}
 	}
 
-	log.Println("user is not allowed")
+	logger.Info("user is not allowed")
 	return false
 }
 
@@ -100,7 +101,7 @@ func (a *Auth) RefreshAuthToken(refreshToken string) (*AuthToken, error) {
 func (a *Auth) RedirectLink(origin string) string {
 	redirectUrl, err := url.Parse(authUrl + "/authorize")
 	if err != nil {
-		log.Fatalf("failed to parse url: %s", authUrl)
+		logger.Warn("failed to parse url", "url", authUrl)
 	}
 
 	query := url.Values{}
@@ -117,26 +118,26 @@ func (a *Auth) RedirectLink(origin string) string {
 		query.Encode(), "+", "%20",
 	)
 
-	log.Printf("parsed url: %s", redirectUrl.String())
+	logger.Info("parsed url", "url", redirectUrl.String())
 
 	return redirectUrl.String()
 }
 
 func fetchAuthToken(params interface{}) (*AuthToken, error) {
-	log.Print("parse params", params)
+	logger.Info("fetching auth token", "params", params)
 	body, err := json.Marshal(params)
 	if err != nil {
-		log.Fatal("failed to parse params", params, err)
+		logger.Error("failed to parse params", "params", params, "err", err)
 		return nil, err
 	}
 
-	log.Print("fetch auth token with code + credentials")
+	logger.Info("fetch auth token with code with credentials")
 
 	client := &http.Client{}
 	accessTokenUrl := authUrl + "/access_token"
 	req, err := http.NewRequest("POST", accessTokenUrl, bytes.NewBuffer(body))
 	if err != nil {
-		log.Fatal("failed to fetch access token", err)
+		logger.Error("failed to fetch access token", "err", err)
 		return nil, err
 	}
 
@@ -145,27 +146,27 @@ func fetchAuthToken(params interface{}) (*AuthToken, error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		log.Fatal("failed to fetch access token", err)
+		logger.Error("failed to fetch access token", "err", err)
 		return nil, err
 	}
 
-	log.Print("read body buffer")
+	logger.Info("read body buffer")
 	accessTokenRaw, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
-		log.Fatalf("failed to parse body: %v", err)
+		logger.Error("failed to parse body", "err", err)
 		return nil, err
 	}
 
-	log.Print("parse json response ", string(accessTokenRaw))
+	logger.Info("parse json response", "accessTokenRaw", accessTokenRaw)
 	var accessToken AuthToken
 	err = json.Unmarshal(accessTokenRaw, &accessToken)
 	if err != nil {
-		log.Fatalf("failed to unmarshal body: %v", err)
+		logger.Error("failed to unmarshal body", "err", err)
 		return nil, err
 	}
 
-	log.Print("access token is here: ", accessToken)
+	logger.Info("access token is here", "accessToken", accessToken)
 
 	return &accessToken, nil
 }
