@@ -1,6 +1,8 @@
 DB_URL ?= "./test.db"
 
 folder ?= "internal"
+count ?= 1
+time ?= "1s"
 
 all: install run
 
@@ -35,6 +37,11 @@ t: test
 
 test: ./tests/
 	go test -v ./...
+
+b: bench
+
+bench: ./tests/
+	go test -bench=. ./tests/bench/... -count=${count} -benchmem -benchtime=${time}
 
 encrypt: .env
 	gpg -c .env
