@@ -2,6 +2,7 @@ package server
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -31,7 +32,7 @@ func New() *server {
 	port := conf.Port
 	addr := hostname + ":" + port
 
-	engine := html.New("./views", ".html")
+	engine := html.New("../views", ".html")
 	if conf.Env == "development" {
 		engine.Debug(true)
 		engine.Reload(true)
@@ -48,30 +49,48 @@ func New() *server {
 	}
 }
 
-func (s *server) Start() {
-	log.Println("setting up routes...")
+func (s *server) Start(done *chan bool) {
+	log.Println("setting up routes")
 	s.setupRoutes()
 
 	// TODO: seed sqlc db
 
 	startup := func() error {
-		log.Println("starting server dependencies...")
+		log.Println("starting server dependencies")
 
 		if err := db.Init(conf.SqliteUrl); err != nil {
 			return err
 		}
 
 		if err := cron.Start(); err != nil {
-			return err
+			log.Println("[warn] failed to start cron:", err)
 		}
 
 		if err := discord.DiscordService.Open(); err != nil {
-			return err
+			log.Println("[warn] failed to start discord:", err)
 		}
 
 		if err := cache.SetStorage(cache.NewMemCache()); err != nil {
-			return err
+			log.Println("[warn] failed to start cache:", err)
 		}
+
+		// listen for server events
+		s.app.Hooks().OnListen(func(listenData fiber.ListenData) error {
+			if fiber.IsChild() {
+				return nil
+			}
+			scheme := "http"
+			if listenData.TLS {
+				scheme = "https"
+			}
+			log.Println("listening on: ", scheme+"://"+listenData.Host+":"+listenData.Port)
+
+			if done != nil {
+				*done <- true
+			}
+
+			return nil
+		})
 
 		return s.app.Listen(s.addr)
 	}
@@ -105,19 +124,22 @@ func (s *server) setupRoutes() {
 }
 
 func (s *server) Shutdown() {
-	log.Println("shutting down server dependencies...")
-	db.Close()
+	log.Println("shutting down server dependencies")
 
 	cron.Stop()
 	discord.DiscordService.Close()
 
 	if err := s.app.Shutdown(); err != nil {
-		log.Fatal(err)
+		log.Println("failed to shutdown server", err)
 	}
 
 	if err := db.Close(); err != nil {
-		log.Fatalf("error closing db: %e", err)
+		log.Println("failed to shutdown db", err)
 	}
 
 	log.Println("bye bye!")
+}
+
+func (s *server) Test(req *http.Request, timeout ...int) (*http.Response, error) {
+	return s.app.Test(req, timeout...)
 }
