@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -30,7 +29,7 @@ var conf = config.Load()
 func New() *server {
 	hostname := conf.Hostname
 	port := conf.Port
-	addr := fmt.Sprintf("%s:%s", hostname, port)
+	addr := hostname + ":" + port
 
 	engine := html.New("./views", ".html")
 	if conf.Env == "development" {
@@ -50,13 +49,13 @@ func New() *server {
 }
 
 func (s *server) Start() {
-	fmt.Println("setting up routes...")
+	log.Println("setting up routes...")
 	s.setupRoutes()
 
 	// TODO: seed sqlc db
 
 	startup := func() error {
-		fmt.Println("starting services...")
+		log.Println("starting server dependencies...")
 
 		if err := db.Init(conf.SqliteUrl); err != nil {
 			return err
@@ -77,33 +76,17 @@ func (s *server) Start() {
 		return s.app.Listen(s.addr)
 	}
 
-	teardown := func() {
-		fmt.Println("shutting down services...")
-		db.Close() // TODO: deprecate
-
-		cron.Stop()
-		discord.DiscordService.Close()
-
-		if err := s.app.Shutdown(); err != nil {
-			log.Fatal(err)
-		}
-
-		if err := db.Close(); err != nil {
-			log.Fatalf("error closing db: %e", err)
-		}
-	}
-
-	// graceful shutdown
+	// graceful shutdown on interrupt signal
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
 	go func() {
 		<-shutdown // wait for shutdown signal
-		teardown()
+		s.Shutdown()
 	}()
 
 	// await for server to shutdown
 	if err := startup(); err != nil {
-		teardown()
+		s.Shutdown()
 		log.Fatal(err)
 	}
 }
@@ -119,4 +102,22 @@ func (s *server) setupRoutes() {
 	})
 
 	routes.SetupRoutes(s.app)
+}
+
+func (s *server) Shutdown() {
+	log.Println("shutting down server dependencies...")
+	db.Close()
+
+	cron.Stop()
+	discord.DiscordService.Close()
+
+	if err := s.app.Shutdown(); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := db.Close(); err != nil {
+		log.Fatalf("error closing db: %e", err)
+	}
+
+	log.Println("bye bye!")
 }

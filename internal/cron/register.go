@@ -71,8 +71,8 @@ func registerLocalJobs(scriptFolder string) error {
 
 	localCronJobs, err := os.ReadDir(scriptFolder)
 	if err != nil {
-		logger.Println("error loading local cron jobs: ", err)
-		return err
+		logger.Println("[warn] error registering local jobs: ", err)
+		return nil
 	}
 
 	fileCounter := 0
