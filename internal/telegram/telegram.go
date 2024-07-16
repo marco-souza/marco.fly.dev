@@ -20,22 +20,22 @@ func Stop() {
 }
 
 func SendChatMessage(message string) error {
-
 	telegramUrl := url.URL{
 		Scheme: "https",
 		Host:   telegramApiDomain,
 		Path:   fmt.Sprintf("bot%s/sendMessage", telegramBotToken),
 	}
 
+	// prepare query params
 	params := telegramUrl.Query()
+
 	params.Add("parse_mode", "Markdown")
 	params.Add("chat_id", telegramChatID)
 	params.Add("text", message)
 
-	// add params to request
+	// add query params back to request
 	telegramUrl.RawQuery = params.Encode()
 
-	// send NewRequest
 	strUrl := telegramUrl.String()
 	logger.Info("calling telegram api", "url", strUrl)
 

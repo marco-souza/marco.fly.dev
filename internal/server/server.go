@@ -16,6 +16,7 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
+	"github.com/marco-souza/marco.fly.dev/internal/telegram"
 )
 
 var logger = slog.With("service", "server")
@@ -57,22 +58,8 @@ func (s *server) Start(done *chan bool) {
 	// TODO: seed sqlc db
 
 	startup := func() error {
-		logger.Info("starting server dependencies")
-
-		if err := db.Init(config.Load().SqliteUrl); err != nil {
+		if err := s.setupServices(); err != nil {
 			return err
-		}
-
-		if err := cron.Start(); err != nil {
-			logger.Warn("failed to start cron", "err", err)
-		}
-
-		if err := discord.DiscordService.Open(); err != nil {
-			logger.Warn("failed to start discord", "err", err)
-		}
-
-		if err := cache.SetStorage(cache.NewMemCache()); err != nil {
-			logger.Warn("failed to start cache", "err", err)
 		}
 
 		// listen for server events
@@ -125,6 +112,31 @@ func (s *server) setupRoutes() {
 	routes.SetupRoutes(s.app)
 }
 
+func (s *server) setupServices() error {
+	// TODO: refactor this to make use of service interface
+	logger.Info("starting server dependencies")
+
+	if err := db.Init(config.Load().SqliteUrl); err != nil {
+		return err
+	}
+
+	if err := cron.Start(); err != nil {
+		logger.Warn("failed to start cron", "err", err)
+	}
+
+	if err := discord.DiscordService.Open(); err != nil {
+		logger.Warn("failed to start discord", "err", err)
+	}
+
+	if err := cache.SetStorage(cache.NewMemCache()); err != nil {
+		logger.Warn("failed to start cache", "err", err)
+	}
+
+	telegram.Start()
+
+	return nil
+}
+
 func (s *server) Shutdown() {
 	logger.Info("shutting down server dependencies")
 
@@ -138,6 +150,8 @@ func (s *server) Shutdown() {
 	if err := db.Close(); err != nil {
 		logger.Warn("failed to shutdown db", "err", err)
 	}
+
+	telegram.Stop()
 
 	logger.Info("bye!")
 }
