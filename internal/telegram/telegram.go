@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+
+	"github.com/Shopify/go-lua"
 )
 
 var logger = slog.With("service", "telegram")
@@ -60,4 +62,37 @@ func SendChatMessage(message string) error {
 	logger.Info(string(body))
 
 	return nil
+}
+
+func sendMsgWrapper(s *lua.State) int {
+	// get channel from lua
+	message, ok := s.ToString(1) // {channel, message}
+	if !ok {
+		logger.Error("failed to get message", "message", message)
+		s.PushBoolean(false) // {false, channel, message}
+		return 1
+	}
+
+	logger.Info("sending message", "message", message)
+
+	if err := SendChatMessage(message); err != nil {
+		logger.Info("failed to send message", "message", message)
+		s.PushBoolean(false) // {false, channel, message}
+		return 1             // number of results
+	}
+
+	logger.Info("message sent", "message", message)
+	s.PushBoolean(true) // {true, channel, message}
+	return 1            // number of results
+}
+
+func PushClient(l *lua.State) {
+	l.NewTable() // {}
+
+	l.PushString("send_message")     // {}, "send_message"
+	l.PushGoFunction(sendMsgWrapper) // {}, "send_message", sendMsgWrapper
+	l.SetTable(-3)                   // {send_message: sendMsgWrapper}
+
+	// make it available globaly
+	l.SetGlobal("telegram")
 }

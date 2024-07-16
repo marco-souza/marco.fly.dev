@@ -8,6 +8,7 @@ import (
 
 	"github.com/Shopify/go-lua"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
+	"github.com/marco-souza/marco.fly.dev/internal/telegram"
 )
 
 var (
@@ -51,4 +52,5 @@ func Run(snippet string) (string, error) {
 func pushRuntimeLibraries(l *lua.State) {
 	// add discord to Runtime
 	discord.DiscordService.PushClient(l)
+	telegram.PushClient(l)
 }
