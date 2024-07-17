@@ -72,11 +72,15 @@ func FetchTicker(currencyPair string) (*Ticker, error) {
 		return nil, err
 	}
 
+	logger.Info("fetching ticker", "pair", currencyPair)
+
 	// set params
 	params := url.Values{}
 	params.Add("symbol", currencyPair)
 
 	req.URL.RawQuery = params.Encode()
+
+	logger.Info("fetching ticker", "url", req.URL.String())
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -84,15 +88,20 @@ func FetchTicker(currencyPair string) (*Ticker, error) {
 		return nil, err
 	}
 
+	logger.Info("ticker response", "status", res.Status)
+
 	responseBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		logger.Error("error reading response body", "err", err)
+		logger.Error("error reading response body", "err", err, "res", res)
 		return nil, err
 	}
 
+	logger.Info("ticker response", "body", string(responseBody))
+
 	var ticker Ticker
 	if err := json.Unmarshal(responseBody, &ticker); err != nil {
-		panic(err)
+		logger.Error("error parsing ticker", "err", err, "body", string(responseBody))
+		return nil, err
 	}
 
 	return &ticker, nil
