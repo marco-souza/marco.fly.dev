@@ -46,6 +46,7 @@ bench: ./tests/
 
 encrypt: .env
 	gpg -c .env
+	sed -e 's/=.*/=""/g' .env > .env.example
 
 decrypt: .env.gpg
 	gpg -d .env.gpg > .env
