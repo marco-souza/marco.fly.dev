@@ -1,8 +1,8 @@
 # Tasks
 
-- [ ] setup binance module
-    - [ ] get pair exchange rate
-- [ ] setup currency module
+- [x] setup binance module
+    - [x] get pair exchange rate
+- [x] setup currency module
 - [ ] create lua bot to send wallet balance
 
 
