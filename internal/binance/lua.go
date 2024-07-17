@@ -59,6 +59,21 @@ func fetchAccountSnapshot(s *lua.State) int {
 	return 1
 }
 
+func generateWalletReport(s *lua.State) int {
+	logger.Info("generating wallet report")
+
+	report, err := GenerateWalletReport()
+	if err != nil {
+		logger.Error("error generating wallet report", "err", err.Error())
+		s.PushNil()
+		return 1
+	}
+
+	logger.Info("wallet report", "report", report)
+	s.PushString(report)
+	return 1
+}
+
 func PushClient(l *lua.State) {
 	l.NewTable()
 
@@ -68,6 +83,10 @@ func PushClient(l *lua.State) {
 
 	l.PushString("account_snapshot")
 	l.PushGoFunction(fetchAccountSnapshot)
+	l.SetTable(-3)
+
+	l.PushString("wallet_report")
+	l.PushGoFunction(generateWalletReport)
 	l.SetTable(-3)
 
 	l.SetGlobal("binance")

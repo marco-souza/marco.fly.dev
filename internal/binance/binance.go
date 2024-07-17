@@ -12,6 +12,8 @@ import (
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/marco-souza/marco.fly.dev/internal/currency"
 )
 
 var logger = slog.With("service", "binance")
@@ -62,6 +64,95 @@ func FetchAccountSnapshot(walletType string) (*AccountSnapshotResponse, error) {
 	}
 
 	return &accountSnapshot, nil
+}
+
+var pairMap = map[string]string{
+	"BRL": "USDTBRL",
+	"BTC": "BTCUSDT",
+	"ETH": "ETHUSDT",
+	"SOL": "SOLUSDT",
+	"BNB": "BNBUSDT",
+}
+
+func GenerateWalletReport() (string, error) {
+	// fetch account snapshot
+	snapshot, err := FetchAccountSnapshot("SPOT")
+	if err != nil {
+		logger.Error("error fetching account snapshot", "err", err)
+		return "", err
+	}
+
+	// generate report
+	latestSnapshot := snapshot.SnapshotVos[len(snapshot.SnapshotVos)-1]
+	// for _, snapshot := range snapshot.SnapshotVos {
+	date := time.Unix(0, int64(latestSnapshot.UpdateTime)*int64(time.Millisecond))
+	total := latestSnapshot.Data.TotalBtcAsset
+
+	totalFloat, err := strconv.ParseFloat(total, 64)
+	if err != nil {
+		logger.Error("error parsing total", "err", err)
+		return "", err
+	}
+
+	usdRateTick, err := FetchTicker("BTCUSDT")
+	if err != nil {
+		logger.Error("error fetching asset ticker ", "err", err)
+		return "", err
+	}
+
+	usdRateFloat, err := strconv.ParseFloat(usdRateTick.Price, 64)
+	if err != nil {
+		logger.Error("error parsing price", "err", err)
+		return "", err
+	}
+
+	brlUsdRate, err := currency.FetchDolarRealExchangeValue()
+	if err != nil {
+		logger.Error("error fetching exchange rate", "err", err)
+		return "", err
+	}
+
+	formatedDate := date.Format("02.01.2006")
+	totalUsd := totalFloat * usdRateFloat
+	report := fmt.Sprintf("*Wallet Report - %s*\n\n*Total*: `$%.2f ~ R$%.2f`\n---\n", formatedDate, totalUsd, totalUsd*brlUsdRate)
+
+	for _, balance := range latestSnapshot.Data.Balances {
+		if balance.Free == "0" || balance.Asset == "ETHW" {
+			continue
+		}
+
+		price := 1.0
+		if balance.Asset[:3] != "USD" {
+			pair, ok := pairMap[balance.Asset]
+			if !ok {
+				logger.Error("error fetching asset ticker ", "err", "pair not found", "pair", balance.Asset)
+				return "", fmt.Errorf("pair '%s' not found", balance.Asset)
+			}
+
+			t, err := FetchTicker(pair)
+			if err != nil {
+				logger.Error("error fetching asset ticker ", "err", err, "pair", "BTC"+balance.Asset)
+				return "", err
+			}
+
+			price, err = strconv.ParseFloat(t.Price, 64)
+			if err != nil {
+				logger.Error("error parsing price", "err", err)
+				return "", err
+			}
+		}
+
+		free, err := strconv.ParseFloat(balance.Free, 64)
+		if err != nil {
+			logger.Error("error parsing free", "err", err)
+			return "", err
+		}
+
+		total := free * price
+		report += fmt.Sprintf("- %s: `$%.2f ~ R$%.2f`\n", balance.Asset, total, total*brlUsdRate)
+	}
+
+	return report, nil
 }
 
 func FetchTicker(currencyPair string) (*Ticker, error) {
