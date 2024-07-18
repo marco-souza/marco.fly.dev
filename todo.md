@@ -1,5 +1,10 @@
 # Tasks
 
+- [x] setup binance module
+    - [x] get pair exchange rate
+- [x] setup currency module
+- [x] create lua bot to send wallet balance
+
 ## In-Progress // upcoming
 
     - [ ] handle errors for form validation

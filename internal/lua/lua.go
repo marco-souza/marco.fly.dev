@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"github.com/Shopify/go-lua"
+	"github.com/marco-souza/marco.fly.dev/internal/binance"
+	"github.com/marco-souza/marco.fly.dev/internal/currency"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/telegram"
 )
@@ -53,4 +55,6 @@ func pushRuntimeLibraries(l *lua.State) {
 	// add discord to Runtime
 	discord.DiscordService.PushClient(l)
 	telegram.PushClient(l)
+	currency.PushClient(l)
+	binance.PushClient(l)
 }

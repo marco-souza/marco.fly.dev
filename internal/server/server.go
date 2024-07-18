@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
 
+	"github.com/marco-souza/marco.fly.dev/internal/binance"
 	"github.com/marco-souza/marco.fly.dev/internal/cache"
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
@@ -113,7 +114,7 @@ func (s *server) setupRoutes() {
 }
 
 func (s *server) setupServices() error {
-	// TODO: refactor this to make use of service interface
+	// TODO: refactor this to make use of service interface or dependency injection
 	logger.Info("starting server dependencies")
 
 	if err := db.Init(config.Load().SqliteUrl); err != nil {
@@ -134,6 +135,8 @@ func (s *server) setupServices() error {
 
 	telegram.Start()
 
+	binance.Start()
+
 	return nil
 }
 
@@ -152,6 +155,8 @@ func (s *server) Shutdown() {
 	}
 
 	telegram.Stop()
+
+	binance.Stop()
 
 	logger.Info("bye!")
 }
