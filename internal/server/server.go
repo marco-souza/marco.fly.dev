@@ -137,6 +137,8 @@ func (s *server) setupServices() error {
 
 	binance.Start()
 
+	logger.Info("hello", "env", os.Environ())
+
 	return nil
 }
 

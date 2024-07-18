@@ -21,7 +21,10 @@ deploy: ./fly.toml
 	pkgx fly deploy --now -y
 
 secrets: .env
-	echo $$(cat .env | grep -v '^#') | pkgx fly secrets import
+	for line in $$(cat .env | grep -v '^#'); do \
+		echo $$line | sed -e 's#=.*##g'; \
+		echo $$line | pkgx fly secrets set $$line ; \
+	done
 
 generate: sqlc.yml
 	sqlc generate

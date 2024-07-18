@@ -64,7 +64,7 @@ func generateWalletReport(s *lua.State) int {
 
 	report, err := GenerateWalletReport()
 	if err != nil {
-		logger.Error("error generating wallet report", "err", err.Error())
+		logger.Error("error generating wallet report", "err", err)
 		s.PushNil()
 		return 1
 	}
