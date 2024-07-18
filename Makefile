@@ -17,13 +17,13 @@ install:
 run: cmd/server/main.go
 	task dev
 
-deploy: ./fly.toml
+deploy: secrets ./fly.toml
 	pkgx fly deploy --now -y
 
 secrets: .env
 	for line in $$(cat .env | grep -v '^#'); do \
 		echo $$line | sed -e 's#=.*##g'; \
-		echo $$line | pkgx fly secrets set $$line ; \
+		echo $$line | pkgx fly secrets set $$line --stage ; \
 	done
 
 generate: sqlc.yml
