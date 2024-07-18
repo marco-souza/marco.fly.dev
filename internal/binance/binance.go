@@ -114,7 +114,13 @@ func GenerateWalletReport() (string, error) {
 
 	formatedDate := date.Format("02.01.2006")
 	totalUsd := totalFloat * usdRateFloat
-	report := fmt.Sprintf("*Wallet Report - %s*\n\n*Total*: `$%.2f ~ R$%.2f`\n---\n", formatedDate, totalUsd, totalUsd*brlUsdRate)
+	report := fmt.Sprintf(
+		"*Wallet Report - %s*\n\n*Total*: `$%.2f x %.2f = R$%.2f `\n---\n",
+		formatedDate,
+		totalUsd,
+		brlUsdRate,
+		totalUsd*brlUsdRate,
+	)
 
 	for _, balance := range latestSnapshot.Data.Balances {
 		if balance.Free == "0" || balance.Asset == "ETHW" {
@@ -148,11 +154,49 @@ func GenerateWalletReport() (string, error) {
 			return "", err
 		}
 
+		if balance.Asset == "BRL" {
+			// fix pair order (BRL to USD)
+			price = 1 / price
+		}
+
 		total := free * price
-		report += fmt.Sprintf("- %s: `$%.2f ~ R$%.2f`\n", balance.Asset, total, total*brlUsdRate)
+		report += fmt.Sprintf(
+			"- %s %s: `$ %07.4f`\n",
+			balance.Asset[:3],
+			upOrDown(balance.Asset, total),
+			total,
+		)
+
 	}
 
 	return report, nil
+}
+
+var latestTotal = map[string]float64{}
+
+func upOrDown(asset string, current float64) string {
+	previous, ok := latestTotal[asset]
+	if !ok {
+		logger.Warn("missing previous value")
+	}
+
+	// persist latest values
+	latestTotal[asset] = current
+
+	if previous == 0 {
+		return "🔵 (+0.000%)"
+	}
+
+	percentage := (current - previous) / previous * 100
+	if percentage > 0 {
+		return fmt.Sprintf("🔥 (%+4.3f%%)", percentage)
+	}
+
+	if percentage < 0 {
+		return fmt.Sprintf("⛈️  (%+4.3f%%)", percentage)
+	}
+
+	return fmt.Sprintf("🔵 (%+4.3f%%)", percentage)
 }
 
 func FetchTicker(currencyPair string) (*Ticker, error) {
