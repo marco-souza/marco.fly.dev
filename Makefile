@@ -58,4 +58,4 @@ decrypt: .env.gpg
 	gpg -d .env.gpg > .env
 
 gen:
-	@go run ./cmd/cli/cli.go ${folder} ${name}
+	@go run ./cmd/cli/cli.go create ${folder} ${name}
