@@ -20,6 +20,9 @@ run: cmd/server/main.go
 deploy: ./fly.toml
 	pkgx fly deploy --now -y
 
+secrets: .env
+	echo $$(cat .env | grep -v '^#') | pkgx fly secrets import
+
 generate: sqlc.yml
 	sqlc generate
 
