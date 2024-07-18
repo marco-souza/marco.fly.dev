@@ -11,7 +11,8 @@ func sendMsgWrapper(s *lua.State) int {
 	channel, ok := s.ToString(1) // {channel, message}
 	if !ok {
 		logger.Error("failed to get channel", "channel", channel)
-		return 0
+		s.PushBoolean(false) // {false, channel, message}
+		return 1             // number of results
 	}
 
 	// get message from lua
