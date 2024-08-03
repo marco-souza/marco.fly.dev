@@ -11,6 +11,7 @@ install:
 	go install github.com/go-task/task/v3/cmd/task@latest && \
 	go install golang.org/x/tools/gopls@latest && \
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest && \
+	go install github.com/marco-souza/pkg@latest && \
 	go install github.com/marco-souza/hooker@latest && hooker init && \
 	curl --proto '=https' --tlsv1.2 -LsSf https://github.com/frectonz/sql-studio/releases/download/0.1.16/sql-studio-installer.sh | sh
 
@@ -58,4 +59,4 @@ decrypt: .env.gpg
 	gpg -d .env.gpg > .env
 
 gen:
-	@go run ./cmd/cli/cli.go create ${folder} ${name}
+	pkg create ${name} ${folder}
