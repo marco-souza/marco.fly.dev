@@ -122,6 +122,7 @@ func (s *server) setupServices() error {
 	di.Injectable(cfg)
 	di.Injectable(discord.New())
 	di.Injectable(telegram.New())
+	di.Injectable(binance.New())
 
 	if err := db.Init(cfg.SqliteUrl); err != nil {
 		return err
@@ -134,8 +135,6 @@ func (s *server) setupServices() error {
 	if err := cache.SetStorage(cache.NewMemCache()); err != nil {
 		logger.Warn("failed to start cache", "err", err)
 	}
-
-	binance.Start()
 
 	return nil
 }
@@ -152,8 +151,6 @@ func (s *server) Shutdown() {
 	if err := db.Close(); err != nil {
 		logger.Warn("failed to shutdown db", "err", err)
 	}
-
-	binance.Stop()
 
 	logger.Info("bye!")
 }
