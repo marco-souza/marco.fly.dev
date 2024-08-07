@@ -15,6 +15,7 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 	"github.com/marco-souza/marco.fly.dev/internal/telegram"
@@ -114,10 +115,15 @@ func (s *server) setupRoutes() {
 }
 
 func (s *server) setupServices() error {
-	// TODO: refactor this to make use of service interface or dependency injection
 	logger.Info("starting server dependencies")
 
-	if err := db.Init(config.Load().SqliteUrl); err != nil {
+	cfg := config.Load()
+
+	di.Injectable(cfg)
+	di.Injectable(discord.New())
+	di.Injectable(telegram.New())
+
+	if err := db.Init(cfg.SqliteUrl); err != nil {
 		return err
 	}
 
@@ -125,15 +131,9 @@ func (s *server) setupServices() error {
 		logger.Warn("failed to start cron", "err", err)
 	}
 
-	if err := discord.DiscordService.Open(); err != nil {
-		logger.Warn("failed to start discord", "err", err)
-	}
-
 	if err := cache.SetStorage(cache.NewMemCache()); err != nil {
 		logger.Warn("failed to start cache", "err", err)
 	}
-
-	telegram.Start()
 
 	binance.Start()
 
@@ -141,10 +141,9 @@ func (s *server) setupServices() error {
 }
 
 func (s *server) Shutdown() {
-	logger.Info("shutting down server dependencies")
+	di.Clean()
 
 	cron.Stop()
-	discord.DiscordService.Close()
 
 	if err := s.app.Shutdown(); err != nil {
 		logger.Warn("failed to shutdown server", "err", err)
@@ -153,8 +152,6 @@ func (s *server) Shutdown() {
 	if err := db.Close(); err != nil {
 		logger.Warn("failed to shutdown db", "err", err)
 	}
-
-	telegram.Stop()
 
 	binance.Stop()
 
