@@ -26,7 +26,6 @@ func Injectable(entityPointer interface{}) {
 	entity := entityPointer
 	if reflect.TypeOf(entityPointer).Kind() == reflect.Ptr {
 		entity = reflect.ValueOf(entityPointer).Elem().Interface()
-		logger.Warn("entity is a pointer", "entity", entityPointer, "value", entity)
 	}
 
 	t := reflect.TypeOf(entity)
@@ -35,12 +34,11 @@ func Injectable(entityPointer interface{}) {
 		return
 	}
 
-	// check if entity is a Dependency
 	if d, ok := entityPointer.(Service); ok {
-		logger.Info("starting service", "entity", t)
+		logger.Info("injecting", "service", t)
 
 		if err := d.Start(); err != nil {
-			logger.Warn("failed to start dependency", "entity", t, "err", err)
+			logger.Warn("failed to start service", "service", t, "err", err)
 		}
 
 		// register for teardown
@@ -49,7 +47,6 @@ func Injectable(entityPointer interface{}) {
 
 	// register the dependency
 	ctx = context.WithValue(ctx, t, entity)
-	logger.Info("dependency injected", "dependency", t)
 }
 
 func Inject[T any](entity T) (*T, error) {
@@ -68,10 +65,8 @@ func Inject[T any](entity T) (*T, error) {
 
 // clean the Container
 func Clean() {
-	// run all teardown functions
-	logger.Info("cleaning dependencies", "count", len(teardownServices))
 	for _, svc := range teardownServices {
-		logger.Info("tearing down", "svc", svc)
+		logger.Info("tearing down", "service", svc)
 		if err := svc.Stop(); err != nil {
 			logger.Warn("failed to teardown dependency", "err", err)
 		}

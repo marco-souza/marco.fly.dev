@@ -50,7 +50,6 @@ func New() *DatabaseService {
 
 func (ds *DatabaseService) Start() error {
 	// setup the database schema
-	logger.Info("init database schema")
 	if _, err := ds.client.ExecContext(ds.Ctx, dbSchema); err != nil {
 		logger.Error("error configuring db tables", "err", err)
 	}
@@ -59,8 +58,5 @@ func (ds *DatabaseService) Start() error {
 }
 
 func (ds *DatabaseService) Stop() error {
-	logger.Info("closing db")
-	ds.Ctx = nil
-	ds.Queries = nil
 	return ds.client.Close()
 }

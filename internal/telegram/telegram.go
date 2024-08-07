@@ -29,12 +29,10 @@ func New() *TelegramService {
 }
 
 func (t *TelegramService) Start() error {
-	logger.Info("starting telegram service")
 	return nil
 }
 
 func (t *TelegramService) Stop() error {
-	logger.Info("stopping telegram service")
 	return nil
 }
 
@@ -56,8 +54,6 @@ func (t *TelegramService) SendChatMessage(message string) error {
 	telegramUrl.RawQuery = params.Encode()
 
 	strUrl := telegramUrl.String()
-	logger.Info("calling telegram api", "url", strUrl)
-
 	res, err := http.Get(strUrl)
 	if err != nil {
 		logger.Error("error calling telegram api", "err", err)
@@ -76,8 +72,7 @@ func (t *TelegramService) SendChatMessage(message string) error {
 		return err
 	}
 
-	logger.Info(string(body))
-
+	logger.Info("telegram api response", "body", string(body))
 	return nil
 }
 

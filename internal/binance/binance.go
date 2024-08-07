@@ -26,13 +26,11 @@ func New() *BinanceService {
 }
 
 func (b *BinanceService) Start() error {
-	logger.Info("starting binance service")
 	loadEnvs()
 	return nil
 }
 
 func (b *BinanceService) Stop() error {
-	logger.Info("stopping binance service")
 	return nil
 }
 

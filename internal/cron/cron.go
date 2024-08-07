@@ -49,7 +49,6 @@ func New() *TaskScheduleService {
 }
 
 func (tss *TaskScheduleService) Start() error {
-	logger.Info("starting scheduler")
 	tss.scheduler.Start()
 
 	if err := tss.registerPersistedJobs(); err != nil {
@@ -66,7 +65,6 @@ func (tss *TaskScheduleService) Start() error {
 }
 
 func (tss *TaskScheduleService) Stop() error {
-	logger.Info("stopping scheduler")
 	tss.scheduler.Stop()
 	return nil
 }
