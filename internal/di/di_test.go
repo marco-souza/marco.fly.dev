@@ -19,8 +19,10 @@ func TestMain(t *testing.T) {
 
 	// inject an instance of Test
 	t.Run("Get an structure", func(t *testing.T) {
-		t1 := di.Inject(Test{})
-		t2 := di.Inject(Test{})
+		t1, err := di.Inject(Test{})
+		assert.Nil(t, err)
+		t2, err := di.Inject(Test{})
+		assert.Nil(t, err)
 
 		assert.Equal(t, t1.name, t2.name)
 		assert.Equal(t, t1, t2)
@@ -29,6 +31,7 @@ func TestMain(t *testing.T) {
 	// clean the container
 	t.Run("Clean the container", func(t *testing.T) {
 		di.Clean()
-		assert.Empty(t, di.Inject(Test{}))
+		_, err := di.Inject(Test{})
+		assert.ErrorContains(t, err, "not found")
 	})
 }

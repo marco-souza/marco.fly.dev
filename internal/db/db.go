@@ -5,50 +5,62 @@ import (
 	"database/sql"
 	"log/slog"
 
+	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/db/sqlc"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
 
 	_ "embed"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var (
-	Ctx     context.Context = context.Background()
-	client  *sql.DB
-	Queries *sqlc.Queries
-	logger  = slog.With("service", "db")
-)
+var logger = slog.With("service", "db")
 
 //go:embed schema.sql
-var ddl string
+var dbSchema string
 
-func Init(file string) error {
-	logger.Info("init db")
+type DatabaseService struct {
+	File    string
+	Ctx     context.Context
+	client  *sql.DB
+	Queries *sqlc.Queries
+}
 
+func New() *DatabaseService {
+	cfg, err := di.Inject(config.Config{})
+	if err != nil {
+		panic(err)
+	}
+
+	file := cfg.SqliteUrl
 	if file == "" {
+		logger.Info("use in-memory db")
 		file = ":memory:"
 	}
 
-	db, err := sql.Open("sqlite3", file)
+	ctx := context.Background()
+	client, err := sql.Open("sqlite3", file)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	// setup client and context
-	client = db
+	queries := sqlc.New(client)
+	return &DatabaseService{file, ctx, client, queries}
+}
 
+func (ds *DatabaseService) Start() error {
 	// setup the database schema
-	if _, err := db.ExecContext(Ctx, ddl); err != nil {
+	logger.Info("init database schema")
+	if _, err := ds.client.ExecContext(ds.Ctx, dbSchema); err != nil {
 		logger.Error("error configuring db tables", "err", err)
 	}
 
-	Queries = sqlc.New(db)
 	return nil
 }
 
-func Close() error {
+func (ds *DatabaseService) Stop() error {
 	logger.Info("closing db")
-
-	Ctx = nil
-	Queries = nil
-	return client.Close()
+	ds.Ctx = nil
+	ds.Queries = nil
+	return ds.client.Close()
 }

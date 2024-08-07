@@ -57,8 +57,6 @@ func (s *server) Start(done *chan bool) {
 	logger.Info("setting up routes")
 	s.setupRoutes()
 
-	// TODO: seed sqlc db
-
 	startup := func() error {
 		if err := s.setupServices(); err != nil {
 			return err
@@ -117,20 +115,12 @@ func (s *server) setupRoutes() {
 func (s *server) setupServices() error {
 	logger.Info("starting server dependencies")
 
-	cfg := config.Load()
-
-	di.Injectable(cfg)
+	di.Injectable(config.Load())
+	di.Injectable(db.New())
+	di.Injectable(cron.New())
 	di.Injectable(discord.New())
-	di.Injectable(telegram.New())
 	di.Injectable(binance.New())
-
-	if err := db.Init(cfg.SqliteUrl); err != nil {
-		return err
-	}
-
-	if err := cron.Start(); err != nil {
-		logger.Warn("failed to start cron", "err", err)
-	}
+	di.Injectable(telegram.New())
 
 	if err := cache.SetStorage(cache.NewMemCache()); err != nil {
 		logger.Warn("failed to start cache", "err", err)
@@ -142,14 +132,8 @@ func (s *server) setupServices() error {
 func (s *server) Shutdown() {
 	di.Clean()
 
-	cron.Stop()
-
 	if err := s.app.Shutdown(); err != nil {
 		logger.Warn("failed to shutdown server", "err", err)
-	}
-
-	if err := db.Close(); err != nil {
-		logger.Warn("failed to shutdown db", "err", err)
 	}
 
 	logger.Info("bye!")

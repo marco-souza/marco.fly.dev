@@ -41,7 +41,6 @@ func Injectable(entityPointer interface{}) {
 
 		if err := d.Start(); err != nil {
 			logger.Warn("failed to start dependency", "entity", t, "err", err)
-			return
 		}
 
 		// register for teardown

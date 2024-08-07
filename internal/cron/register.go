@@ -6,14 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/lua"
 )
 
 // Setup scheduler by initializing cronjobs, registering lua scripts persisted
-func registerPersistedJobs() error {
-	logger.Info("loading persisted cron jobs")
-	crons, err := db.Queries.ListCronJobs(db.Ctx)
+func (tss *TaskScheduleService) registerPersistedJobs() error {
+	logger.Info("loading persisted cron jobs", "ctx", tss.db.Ctx, "q", tss.db.Queries)
+	crons, err := tss.db.Queries.ListCronJobs(tss.db.Ctx)
 	if err != nil {
 		logger.Error("error loading persisted cron jobs", "err", err)
 		return err
@@ -37,7 +36,7 @@ func registerPersistedJobs() error {
 			}
 		}
 
-		if err := register(int(c.ID), c.Expression, cronHandler); err != nil {
+		if err := tss.register(int(c.ID), c.Expression, cronHandler); err != nil {
 			logger.Warn("error adding cron job", "name", c.Name, "err", err)
 			continue
 		}
@@ -46,19 +45,19 @@ func registerPersistedJobs() error {
 	return nil
 }
 
-func register(id int, cronExpr string, handler func()) error {
-	entryID, err := scheduler.AddFunc(cronExpr, handler)
+func (tss *TaskScheduleService) register(id int, cronExpr string, handler func()) error {
+	entryID, err := tss.scheduler.AddFunc(cronExpr, handler)
 	if err != nil {
 		return err
 	}
 
-	runningJobs[id] = entryID
+	tss.runningJobs[id] = entryID
 	logger.Info("cron job registered", "id", entryID)
 
 	return nil
 }
 
-func registerLocalJobs(scriptFolder string) error {
+func (tss *TaskScheduleService) registerLocalJobs(scriptFolder string) error {
 	logger.Info("loading local cron jobs")
 
 	localCronJobs, err := os.ReadDir(scriptFolder)
@@ -92,7 +91,7 @@ func registerLocalJobs(scriptFolder string) error {
 		baseInt := 10000 // offset to avoid conflict with persisted jobs
 		localID := baseInt + fileCounter
 
-		if err := register(localID, cronExpr, func() {
+		if err := tss.register(localID, cronExpr, func() {
 			logger.Info("executing cron job", "name", name)
 			lua.Run(script) // ignore error
 		}); err != nil {
