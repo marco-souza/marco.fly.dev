@@ -1,8 +1,6 @@
 ## Focusing on
-- [ ] #A [di] implement a lightweight DI container (5)
 
 ## Backlog
-- [ ] #A [cron] add db for persistency #15 (3)
 - [ ] #A [cache] add support for sqlite cache (3)
 - [ ] #B [cron] edit cron jobs #15 (3)
 - [ ] #C [ui] handle errors for form validation (5)
@@ -12,6 +10,7 @@
 - [ ] [binance] geo-blocking for US services (like Fly.io)
 
 ## Done
+- [x] #A [di] implement a lightweight DI container (5)
 - [x] integrate with telegram
 - [X] create allowed email to sign-in
 - [X] improve security
