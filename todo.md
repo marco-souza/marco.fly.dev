@@ -1,9 +1,9 @@
 ## Focusing on
+- [ ] #A [di] implement a lightweight DI container (5)
 
 ## Backlog
 - [ ] #A [cron] add db for persistency #15 (3)
 - [ ] #A [cache] add support for sqlite cache (3)
-- [ ] #A [di] implement a lightweight DI container (5)
 - [ ] #B [cron] edit cron jobs #15 (3)
 - [ ] #C [ui] handle errors for form validation (5)
 - [ ] #C [ui] improve UI error handling (3)

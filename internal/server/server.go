@@ -24,10 +24,11 @@ import (
 var logger = slog.With("service", "server")
 
 type server struct {
-	addr     string
-	hostname string
-	port     string
-	app      *fiber.App
+	IsProduction bool
+	addr         string
+	hostname     string
+	port         string
+	app          *fiber.App
 }
 
 func New() *server {
@@ -43,9 +44,10 @@ func New() *server {
 	}
 
 	return &server{
-		addr:     addr,
-		port:     port,
-		hostname: hostname,
+		IsProduction: conf.Env == "production",
+		addr:         addr,
+		port:         port,
+		hostname:     hostname,
 		app: fiber.New(fiber.Config{
 			Views:       engine,
 			ViewsLayout: "layouts/main",
@@ -100,12 +102,17 @@ func (s *server) Start(done *chan bool) {
 }
 
 func (s *server) setupRoutes() {
+	duration := 10 * time.Second
+	if s.IsProduction {
+		duration = 15 * time.Minute
+	}
+
 	logger.Info("setup static resources")
 	s.app.Static("/static", "./static", fiber.Static{
 		Compress:      true,
 		ByteRange:     true,
 		Browse:        true,
-		CacheDuration: 10 * time.Second,
+		CacheDuration: duration,
 		MaxAge:        3600,
 	})
 
@@ -115,16 +122,14 @@ func (s *server) setupRoutes() {
 func (s *server) setupServices() error {
 	logger.Info("starting server dependencies")
 
+	// order matters, as for now each service ask for its dependencies
 	di.Injectable(config.Load())
 	di.Injectable(db.New())
+	di.Injectable(cache.New())
 	di.Injectable(cron.New())
 	di.Injectable(discord.New())
 	di.Injectable(binance.New())
 	di.Injectable(telegram.New())
-
-	if err := cache.SetStorage(cache.NewMemCache()); err != nil {
-		logger.Warn("failed to start cache", "err", err)
-	}
 
 	return nil
 }

@@ -49,6 +49,8 @@ func Injectable(entityPointer interface{}) {
 	ctx = context.WithValue(ctx, t, entity)
 }
 
+// TODO: Implement `Invoke` method to inject dependencies automatically
+
 func Inject[T any](entity T) (*T, error) {
 	t := reflect.TypeOf(entity)
 	instance := ctx.Value(t)
