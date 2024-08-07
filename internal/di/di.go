@@ -13,7 +13,7 @@ type Service interface {
 
 var logger = slog.With("service", "di")
 var ctx = context.Background()
-var teardownFunctions = []func() error{}
+var teardownServices = []Service{}
 
 func Injectable(entityPointer interface{}) {
 	if entityPointer == nil {
@@ -44,7 +44,7 @@ func Injectable(entityPointer interface{}) {
 		}
 
 		// register for teardown
-		teardownFunctions = append(teardownFunctions, d.Stop)
+		teardownServices = append(teardownServices, d)
 	}
 
 	// register the dependency
@@ -69,15 +69,14 @@ func Inject[T any](entity T) *T {
 // clean the Container
 func Clean() {
 	// run all teardown functions
-	logger.Info("cleaning dependencies", "count", len(teardownFunctions))
-	for _, f := range teardownFunctions {
-		if err := f(); err != nil {
-			logger.Info("failed to teardown dependency", "err", err)
+	logger.Info("cleaning dependencies", "count", len(teardownServices))
+	for _, svc := range teardownServices {
+		logger.Info("tearing down", "svc", svc)
+		if err := svc.Stop(); err != nil {
+			logger.Warn("failed to teardown dependency", "err", err)
 		}
-
-		logger.Info("dependency teardown", "func", f)
 	}
 
 	ctx = context.Background()
-	teardownFunctions = []func() error{}
+	teardownServices = []Service{}
 }
