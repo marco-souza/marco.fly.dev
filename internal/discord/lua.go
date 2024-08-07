@@ -26,7 +26,13 @@ func sendMsgWrapper(s *lua.State) int {
 
 	logger.Info("sending message to channel", "channel", channel, "message", message)
 
-	dc := di.Inject(DiscordService{})
+	dc, err := di.Inject(DiscordService{})
+	if err != nil {
+		logger.Error("failed to get discord service", "err", err)
+		s.PushBoolean(false) // {false, channel, message}
+		return 1             // number of results
+	}
+
 	if err := dc.SendMessage(channel, message); err != nil {
 		logger.Info("failed to send message", "channel", channel, "message", message)
 		s.PushBoolean(false) // {false, channel, message}

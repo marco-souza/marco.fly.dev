@@ -2,6 +2,7 @@ package di
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"reflect"
 )
@@ -52,18 +53,18 @@ func Injectable(entityPointer interface{}) {
 	logger.Info("dependency injected", "dependency", t)
 }
 
-func Inject[T any](entity T) *T {
+func Inject[T any](entity T) (*T, error) {
 	t := reflect.TypeOf(entity)
 	instance := ctx.Value(t)
 	if instance == nil {
-		return nil
+		return nil, fmt.Errorf("dependency not found: %s", t)
 	}
 
 	if t, ok := instance.(T); ok {
-		return &t
+		return &t, nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("failed to cast dependency: %s", t)
 }
 
 // clean the Container
