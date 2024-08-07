@@ -53,7 +53,7 @@ func Run(snippet string) (string, error) {
 
 func pushRuntimeLibraries(l *lua.State) {
 	// add discord to Runtime
-	discord.DiscordService.PushClient(l)
+	discord.PushClient(l)
 	telegram.PushClient(l)
 	currency.PushClient(l)
 	binance.PushClient(l)
