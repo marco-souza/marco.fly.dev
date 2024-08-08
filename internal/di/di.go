@@ -47,6 +47,9 @@ func Injectable(entityPointer interface{}) {
 		return
 	}
 
+	// register the dependency
+	ctx = context.WithValue(ctx, t, entity)
+
 	if d, ok := entityPointer.(Service); ok {
 		logger.Info("injecting", "service", t)
 
@@ -57,9 +60,6 @@ func Injectable(entityPointer interface{}) {
 		// register for teardown
 		teardownServices = append(teardownServices, d)
 	}
-
-	// register the dependency
-	ctx = context.WithValue(ctx, t, entity)
 }
 
 func Invoke[F any](cb F) error {
