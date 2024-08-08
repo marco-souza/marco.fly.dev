@@ -49,7 +49,34 @@ func Injectable(entityPointer interface{}) {
 	ctx = context.WithValue(ctx, t, entity)
 }
 
-// TODO: Implement `Invoke` method to inject dependencies automatically
+func Invoke[F any](cb F) error {
+	// get cb arguments into args
+	fn := reflect.ValueOf(cb)
+	args := []reflect.Type{}
+	for i := 0; i < fn.Type().NumIn(); i++ {
+		elem := fn.Type().In(i)
+		args = append(args, elem)
+	}
+
+	// get real values for cb deps
+	deps := make([]reflect.Value, len(args))
+	for i, arg := range args {
+		dep := ctx.Value(arg)
+		if dep == nil {
+			return fmt.Errorf("dependency not found: %s", arg)
+		}
+
+		deps[i] = reflect.ValueOf(dep)
+	}
+
+	// call db with deps
+	result := reflect.ValueOf(cb).Call(deps)[0]
+	if result.IsNil() {
+		return nil
+	}
+
+	return result.Interface().(error)
+}
 
 func Inject[T any](entity T) (*T, error) {
 	t := reflect.TypeOf(entity)

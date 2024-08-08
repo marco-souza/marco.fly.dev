@@ -34,4 +34,15 @@ func TestMain(t *testing.T) {
 		_, err := di.Inject(Test{})
 		assert.ErrorContains(t, err, "not found")
 	})
+
+	// invoke a function with the instance of Test
+	t.Run("Invoke a function with the instance of Test", func(t *testing.T) {
+		di.Injectable(Test{name: "test"})
+
+		err := di.Invoke(func(injectedTest Test) error {
+			assert.Equal(t, injectedTest.name, "test")
+			return nil
+		})
+		assert.Nil(t, err)
+	})
 }
