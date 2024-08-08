@@ -13,27 +13,34 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/telegram"
 )
 
-var (
-	stdoutLock = &sync.Mutex{}
-	logger     = slog.With("lua:")
-)
+var logger = slog.With("lua:")
 
-func Run(snippet string) (string, error) {
-	// setup lua runtime
-	l := lua.NewState()
+type LuaService struct {
+	*lua.State
+	outputLock *sync.Mutex
+}
 
-	lua.OpenLibraries(l)
-	pushRuntimeLibraries(l)
+func NewLuaService() *LuaService {
+	state := lua.NewState()
 
+	lua.OpenLibraries(state)
+
+	return &LuaService{
+		State:      state,
+		outputLock: &sync.Mutex{},
+	}
+}
+
+func (ls *LuaService) Run(snippet string) (string, error) {
 	// running lua snippet
-	stdoutLock.Lock()
-	defer stdoutLock.Unlock()
+	ls.outputLock.Lock()
+	defer ls.outputLock.Unlock()
 
 	outputReader, outputWriter, _ := os.Pipe()
 	rescueStdout := os.Stdout // save the actual stdout
 	os.Stdout = outputWriter  //  redirect stdout to pipe
 
-	err := lua.DoString(l, snippet)
+	err := lua.DoString(ls.State, snippet)
 	if err != nil {
 		logger.Error("error running lua snippet", "err", err)
 		return "", err
@@ -51,10 +58,16 @@ func Run(snippet string) (string, error) {
 	return string(output), nil
 }
 
-func pushRuntimeLibraries(l *lua.State) {
+func (ls *LuaService) Start() error {
 	// add discord to Runtime
-	discord.DiscordService.PushClient(l)
-	telegram.PushClient(l)
-	currency.PushClient(l)
-	binance.PushClient(l)
+	discord.PushClient(ls.State)
+	telegram.PushClient(ls.State)
+	currency.PushClient(ls.State)
+	binance.PushClient(ls.State)
+
+	return nil
+}
+
+func (ls *LuaService) Stop() error {
+	return nil
 }

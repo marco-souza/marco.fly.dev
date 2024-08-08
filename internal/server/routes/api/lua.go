@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
 	"github.com/marco-souza/marco.fly.dev/internal/lua"
 )
 
@@ -16,7 +17,13 @@ func luaHandler(c *fiber.Ctx) error {
 	}
 
 	logger.Info("lua code", "snippet", snippet)
-	code, err := lua.Run(snippet)
+	code := ""
+	err := di.Invoke(func(l *lua.LuaService) error {
+		output, err := l.Run(snippet)
+		code = output
+		return err
+	})
+
 	if err != nil {
 		logger.Error("lua error", "err", err)
 		lines := []string{err.Error()}

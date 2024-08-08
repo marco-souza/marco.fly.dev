@@ -3,8 +3,10 @@ package db_test
 import (
 	"testing"
 
+	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/db/sqlc"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,14 +18,17 @@ func TestDbClient(t *testing.T) {
 		Script:     "echo test",
 	}
 
-	err := db.Init("")
+	di.Injectable(config.Config{SqliteUrl: ":memory:"})
+
+	ds := db.New()
+	err := ds.Start()
 	assert.NoError(t, err)
 
-	defer db.Close()
+	defer ds.Stop()
 
 	t.Run("create cronjob", func(t *testing.T) {
 		// create cronjob
-		insertedCron, err := db.Queries.CreateCronJob(db.Ctx, cronToInsert)
+		insertedCron, err := ds.Queries.CreateCronJob(ds.Ctx, cronToInsert)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, insertedCron)
@@ -38,7 +43,7 @@ func TestDbClient(t *testing.T) {
 
 	t.Run("fetch cronjob", func(t *testing.T) {
 		// fetch inserted cron
-		cron, err := db.Queries.GetCronJob(db.Ctx, id)
+		cron, err := ds.Queries.GetCronJob(ds.Ctx, id)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, cron)
@@ -58,11 +63,11 @@ func TestDbClient(t *testing.T) {
 			Expression: cronToInsert.Expression,
 		}
 
-		err = db.Queries.UpdateCronJob(db.Ctx, cronUpdatePayload)
+		err = ds.Queries.UpdateCronJob(ds.Ctx, cronUpdatePayload)
 		assert.NoError(t, err)
 
 		// fetch inserted cron
-		cron, err := db.Queries.GetCronJob(db.Ctx, id)
+		cron, err := ds.Queries.GetCronJob(ds.Ctx, id)
 
 		assert.NoError(t, err)
 		assert.NotNil(t, cron)
@@ -73,7 +78,7 @@ func TestDbClient(t *testing.T) {
 
 	t.Run("list cronjobs", func(t *testing.T) {
 		// listing crons
-		crons, err := db.Queries.ListCronJobs(db.Ctx)
+		crons, err := ds.Queries.ListCronJobs(ds.Ctx)
 		assert.NoError(t, err)
 		assert.NotEmpty(t, crons)
 

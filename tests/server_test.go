@@ -13,7 +13,13 @@ import (
 func TestCanCreateServer(t *testing.T) {
 	t.Setenv("VIEWS", "../views/")
 
-	s := server.New()
+	done := make(chan bool)
+	s := server.New(&done)
+	s.Start()
+
+	go s.Run()
+
+	defer s.Stop()
 	values := fmt.Sprintf("%v", s)
 	baseUrl := "http://localhost:3001"
 
@@ -24,11 +30,7 @@ func TestCanCreateServer(t *testing.T) {
 	})
 
 	t.Run("can start server", func(t *testing.T) {
-		done := make(chan bool)
-		go s.Start(&done)
-
 		assert.True(t, <-done)
-		fmt.Println("server started")
 	})
 
 	t.Run("can fetch home /", func(t *testing.T) {
@@ -56,7 +58,7 @@ func TestCanCreateServer(t *testing.T) {
 	})
 
 	t.Run("can shutdown server", func(t *testing.T) {
-		s.Shutdown()
+		s.Stop()
 		fmt.Println("server stopped")
 	})
 }

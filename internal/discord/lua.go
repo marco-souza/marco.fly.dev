@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Shopify/go-lua"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
 )
 
 func sendMsgWrapper(s *lua.State) int {
@@ -25,7 +26,11 @@ func sendMsgWrapper(s *lua.State) int {
 
 	logger.Info("sending message to channel", "channel", channel, "message", message)
 
-	if err := DiscordService.SendMessage(channel, message); err != nil {
+	err := di.Invoke(func(dc DiscordService) {
+		dc.SendMessage(channel, message)
+	})
+
+	if err != nil {
 		logger.Info("failed to send message", "channel", channel, "message", message)
 		s.PushBoolean(false) // {false, channel, message}
 		return 1             // number of results
@@ -53,7 +58,7 @@ func isWorkDay(l *lua.State) int {
 	return 1
 }
 
-func (d *discordService) PushClient(l *lua.State) {
+func PushClient(l *lua.State) {
 	// ref: https://stackoverflow.com/a/37874926
 	l.NewTable() // {}
 

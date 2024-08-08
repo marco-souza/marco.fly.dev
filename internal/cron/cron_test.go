@@ -3,17 +3,23 @@ package cron_test
 import (
 	"testing"
 
+	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
+	"github.com/marco-souza/marco.fly.dev/internal/lua"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCronJob(t *testing.T) {
-	db.Init("")
-	defer db.Close()
+	di.Injectables(
+		config.Config{SqliteUrl: ":memory:"},
+		db.New,
+		lua.LuaService{},
+		cron.New,
+	)
 
-	cron.Start()
-	defer cron.Stop()
+	taskScheduler := di.MustInject(cron.TaskScheduleService{})
 
 	luaScript := "print('hello lua')"
 	expressions := []string{
@@ -23,24 +29,24 @@ func TestCronJob(t *testing.T) {
 
 	t.Run("can add expression", func(t *testing.T) {
 		for _, expr := range expressions {
-			err := cron.AddScript(expr, expr, luaScript)
+			err := taskScheduler.AddScript(expr, expr, luaScript)
 			assert.Nil(t, err)
 		}
 	})
 
 	t.Run("fail if expression is invalid", func(t *testing.T) {
-		err := cron.AddScript("first", "* * * * * *", luaScript)
+		err := taskScheduler.AddScript("first", "* * * * * *", luaScript)
 		assert.Contains(t, err.Error(), "6")
 
-		err = cron.AddScript("second", "invalid", luaScript)
+		err = taskScheduler.AddScript("second", "invalid", luaScript)
 		assert.Contains(t, err.Error(), "invalid")
 
-		err = cron.AddScript("third", "1ms", luaScript)
+		err = taskScheduler.AddScript("third", "1ms", luaScript)
 		assert.Contains(t, err.Error(), "1ms")
 	})
 
 	t.Run("can list expression", func(t *testing.T) {
-		crons := cron.List()
+		crons := taskScheduler.List()
 		assert.Equal(t, len(crons), 2)
 
 		for _, cronEntry := range crons {
@@ -50,19 +56,19 @@ func TestCronJob(t *testing.T) {
 	})
 
 	t.Run("do nothing if deleting invalid id", func(t *testing.T) {
-		assert.Len(t, cron.List(), len(expressions))
+		assert.Len(t, taskScheduler.List(), len(expressions))
 
-		cron.Del(-1)
+		taskScheduler.Del(-1)
 
-		assert.Len(t, cron.List(), len(expressions))
+		assert.Len(t, taskScheduler.List(), len(expressions))
 	})
 
 	t.Run("can delete expression", func(t *testing.T) {
 		size := len(expressions)
-		assert.Len(t, cron.List(), size)
+		assert.Len(t, taskScheduler.List(), size)
 
-		cron.Del(1)
+		taskScheduler.Del(1)
 
-		assert.Len(t, cron.List(), size-1)
+		assert.Len(t, taskScheduler.List(), size-1)
 	})
 }
