@@ -24,15 +24,16 @@ import (
 
 var logger = slog.With("service", "server")
 
-type server struct {
+type Server struct {
 	IsProduction bool
+	Done         *chan bool
 	addr         string
 	hostname     string
 	port         string
 	app          *fiber.App
 }
 
-func New() *server {
+func New(done *chan bool) *Server {
 	conf := config.Load()
 	hostname := conf.Hostname
 	port := conf.Port
@@ -44,7 +45,8 @@ func New() *server {
 		engine.Reload(true)
 	}
 
-	return &server{
+	return &Server{
+		Done:         done,
 		IsProduction: conf.Env == "production",
 		addr:         addr,
 		port:         port,
@@ -56,70 +58,14 @@ func New() *server {
 	}
 }
 
-func (s *server) Start(done *chan bool) {
+func (s *Server) Start() error {
 	logger.Info("setting up routes")
-	s.setupRoutes()
 
-	startup := func() error {
-		logger.Info("starting server dependencies")
-
-		// order matters, as for now each service ask for its dependencies
-		di.Injectables(
-			config.Load,
-			db.New,
-			cache.New,
-			discord.New,
-			binance.New,
-			telegram.New,
-			lua.NewLuaService,
-			cron.New,
-		)
-
-		// listen for server events
-		s.app.Hooks().OnListen(func(listenData fiber.ListenData) error {
-			if fiber.IsChild() {
-				return nil
-			}
-			scheme := "http"
-			if listenData.TLS {
-				scheme = "https"
-			}
-			url := scheme + "://" + listenData.Host + ":" + listenData.Port
-			logger.Info("listening on " + url)
-
-			if done != nil {
-				*done <- true
-			}
-
-			return nil
-		})
-
-		return s.app.Listen(s.addr)
-	}
-
-	// graceful shutdown on interrupt signal
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
-	go func() {
-		<-shutdown // wait for shutdown signal
-		logger.Info("shutting down server", "reason", "interrupt")
-		s.Shutdown()
-	}()
-
-	// await for server to shutdown
-	if err := startup(); err != nil {
-		s.Shutdown()
-		logger.Info("shutting down server", "reason", "server error", "err", err)
-	}
-}
-
-func (s *server) setupRoutes() {
 	duration := 10 * time.Second
 	if s.IsProduction {
 		duration = 15 * time.Minute
 	}
 
-	logger.Info("setup static resources")
 	s.app.Static("/static", "./static", fiber.Static{
 		Compress:      true,
 		ByteRange:     true,
@@ -129,18 +75,67 @@ func (s *server) setupRoutes() {
 	})
 
 	routes.SetupRoutes(s.app)
+
+	logger.Info("starting server ependencies")
+	// order matters, as for now each service ask for its dependencies
+	di.Injectables(
+		config.Load,
+		db.New,
+		cache.New,
+		discord.New,
+		binance.New,
+		telegram.New,
+		lua.NewLuaService,
+		cron.New,
+	)
+
+	// listen for server events
+	s.app.Hooks().OnListen(func(listenData fiber.ListenData) error {
+		if fiber.IsChild() {
+			return nil
+		}
+		scheme := "http"
+		if listenData.TLS {
+			scheme = "https"
+		}
+		url := scheme + "://" + listenData.Host + ":" + listenData.Port
+		logger.Info("listening on " + url)
+
+		if s.Done != nil {
+			*s.Done <- true
+		}
+
+		return nil
+	})
+
+	return nil
 }
 
-func (s *server) Shutdown() {
-	di.Clean()
+func (s *Server) Run() error {
+	// graceful shutdown on interrupt signal
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
+	go func() {
+		<-shutdown // wait for shutdown signal
+		logger.Info("shutting down server", "reason", "interrupt")
+		di.Clean()
+	}()
 
+	// await for server to shutdown
+	return s.app.Listen(s.addr)
+}
+
+func (s *Server) setupRoutes() {
+}
+
+func (s *Server) Stop() error {
 	if err := s.app.Shutdown(); err != nil {
 		logger.Warn("failed to shutdown server", "err", err)
 	}
 
-	logger.Info("bye!")
+	return nil
 }
 
-func (s *server) Test(req *http.Request, timeout ...int) (*http.Response, error) {
+func (s *Server) Test(req *http.Request, timeout ...int) (*http.Response, error) {
 	return s.app.Test(req, timeout...)
 }
