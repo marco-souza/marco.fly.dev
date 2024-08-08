@@ -65,6 +65,15 @@ func Inject[T any](entity T) (*T, error) {
 	return nil, fmt.Errorf("failed to cast dependency: %s", t)
 }
 
+func MustInject[T any](entity T) *T {
+	t, err := Inject(entity)
+	if err != nil {
+		panic(err)
+	}
+
+	return t
+}
+
 // clean the Container
 func Clean() {
 	for _, svc := range teardownServices {

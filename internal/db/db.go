@@ -27,11 +27,7 @@ type DatabaseService struct {
 }
 
 func New() *DatabaseService {
-	cfg, err := di.Inject(config.Config{})
-	if err != nil {
-		panic(err)
-	}
-
+	cfg := di.MustInject(config.Config{})
 	file := cfg.SqliteUrl
 	if file == "" {
 		logger.Info("use in-memory db")

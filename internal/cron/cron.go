@@ -29,11 +29,7 @@ type TaskScheduleService struct {
 }
 
 func New() *TaskScheduleService {
-	dbs, err := di.Inject(db.DatabaseService{})
-	if err != nil {
-		panic(fmt.Errorf("error injecting db service: %w, %v", err, dbs.Ctx))
-	}
-
+	dbs := di.MustInject(db.DatabaseService{})
 	location, err := time.LoadLocation("America/Sao_Paulo")
 	if err != nil {
 		panic(fmt.Errorf("error creating cron scheduler: %w", err))
@@ -70,11 +66,7 @@ func (tss *TaskScheduleService) Stop() error {
 }
 
 func (tss *TaskScheduleService) AddScript(name, cronExpr, script string) error {
-	dbs, err := di.Inject(db.DatabaseService{})
-	if err != nil {
-		panic(fmt.Errorf("error injecting db service: %w, %v", err, dbs.Ctx))
-	}
-
+	dbs := di.MustInject(db.DatabaseService{})
 	job, err := dbs.Queries.CreateCronJob(dbs.Ctx, sqlc.CreateCronJobParams{
 		Name:       name,
 		Expression: cronExpr,

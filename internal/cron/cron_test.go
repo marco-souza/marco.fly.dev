@@ -15,8 +15,7 @@ func TestCronJob(t *testing.T) {
 	di.Injectable(db.New())
 	di.Injectable(cron.New())
 
-	taskScheduler, err := di.Inject(cron.TaskScheduleService{})
-	assert.Nil(t, err)
+	taskScheduler := di.MustInject(cron.TaskScheduleService{})
 
 	luaScript := "print('hello lua')"
 	expressions := []string{

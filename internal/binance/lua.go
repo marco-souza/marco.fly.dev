@@ -17,13 +17,7 @@ func fetchTicker(s *lua.State) int {
 
 	logger.Info("fetching ticker for: " + currencyPair)
 
-	b, err := di.Inject(BinanceService{})
-	if err != nil {
-		logger.Error("failed to get binance service", "err", err)
-		s.PushNil()
-		return 1
-	}
-
+	b := di.MustInject(BinanceService{})
 	tick, err := b.FetchTicker(currencyPair)
 	if err != nil {
 		logger.Error("error fetching ticker", "err", err)
@@ -55,13 +49,7 @@ func fetchAccountSnapshot(s *lua.State) int {
 		return 1
 	}
 
-	b, err := di.Inject(BinanceService{})
-	if err != nil {
-		logger.Error("failed to get binance service", "err", err)
-		s.PushNil()
-		return 1
-	}
-
+	b := di.MustInject(BinanceService{})
 	snapshot, err := b.FetchAccountSnapshot(accType)
 	if err != nil {
 		logger.Error("error fetching account snapshot", "err", err)
@@ -77,13 +65,7 @@ func fetchAccountSnapshot(s *lua.State) int {
 func generateWalletReport(s *lua.State) int {
 	logger.Info("generating wallet report")
 
-	b, err := di.Inject(BinanceService{})
-	if err != nil {
-		logger.Error("failed to get binance service", "err", err)
-		s.PushNil()
-		return 1
-	}
-
+	b := di.MustInject(BinanceService{})
 	report, err := b.GenerateWalletReport()
 	if err != nil {
 		logger.Error("error generating wallet report", "err", err)
