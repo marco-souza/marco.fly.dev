@@ -16,6 +16,12 @@ var logger = slog.With("service", "di")
 var ctx = context.Background()
 var teardownServices = []Service{}
 
+func Injectables(entities ...interface{}) {
+	for _, entity := range entities {
+		Injectable(entity)
+	}
+}
+
 func Injectable(entityPointer interface{}) {
 	if entityPointer == nil {
 		logger.Warn("entity is nil")
@@ -104,7 +110,7 @@ func MustInject[T any](entity T) *T {
 // clean the Container
 func Clean() {
 	for _, svc := range teardownServices {
-		logger.Info("tearing down", "service", svc)
+		logger.Info("tearing down", "service", reflect.TypeOf(svc))
 		if err := svc.Stop(); err != nil {
 			logger.Warn("failed to teardown dependency", "err", err)
 		}

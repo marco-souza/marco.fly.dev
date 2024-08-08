@@ -60,9 +60,18 @@ func (s *server) Start(done *chan bool) {
 	s.setupRoutes()
 
 	startup := func() error {
-		if err := s.setupServices(); err != nil {
-			return err
-		}
+		logger.Info("starting server dependencies")
+
+		// order matters, as for now each service ask for its dependencies
+		di.Injectables(
+			config.Load(),
+			db.New(),
+			cache.New(),
+			cron.New(),
+			discord.New(),
+			binance.New(),
+			telegram.New(),
+		)
 
 		// listen for server events
 		s.app.Hooks().OnListen(func(listenData fiber.ListenData) error {
@@ -91,13 +100,14 @@ func (s *server) Start(done *chan bool) {
 	signal.Notify(shutdown, os.Interrupt) // register channel to interrupt signals
 	go func() {
 		<-shutdown // wait for shutdown signal
+		logger.Info("shutting down server", "reason", "interrupt")
 		s.Shutdown()
 	}()
 
 	// await for server to shutdown
 	if err := startup(); err != nil {
 		s.Shutdown()
-		logger.Error("server failed", "err", err)
+		logger.Info("shutting down server", "reason", "server error", "err", err)
 	}
 }
 
@@ -117,21 +127,6 @@ func (s *server) setupRoutes() {
 	})
 
 	routes.SetupRoutes(s.app)
-}
-
-func (s *server) setupServices() error {
-	logger.Info("starting server dependencies")
-
-	// order matters, as for now each service ask for its dependencies
-	di.Injectable(config.Load())
-	di.Injectable(db.New())
-	di.Injectable(cache.New())
-	di.Injectable(cron.New())
-	di.Injectable(discord.New())
-	di.Injectable(binance.New())
-	di.Injectable(telegram.New())
-
-	return nil
 }
 
 func (s *server) Shutdown() {
