@@ -18,6 +18,13 @@ var teardownServices = []Service{}
 
 func Injectables(entities ...interface{}) {
 	for _, entity := range entities {
+		// if entity is a function, call it and get the result
+		if reflect.TypeOf(entity).Kind() == reflect.Func {
+			factory := reflect.ValueOf(entity)
+			args := []reflect.Value{}
+			entity = factory.Call(args)[0].Interface()
+		}
+
 		Injectable(entity)
 	}
 }

@@ -64,13 +64,13 @@ func (s *server) Start(done *chan bool) {
 
 		// order matters, as for now each service ask for its dependencies
 		di.Injectables(
-			config.Load(),
-			db.New(),
-			cache.New(),
-			cron.New(),
-			discord.New(),
-			binance.New(),
-			telegram.New(),
+			config.Load,
+			db.New,
+			cache.New,
+			cron.New,
+			discord.New,
+			binance.New,
+			telegram.New,
 		)
 
 		// listen for server events
