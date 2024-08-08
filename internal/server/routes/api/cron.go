@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,23 +16,21 @@ func cronsHandler(c *fiber.Ctx) error {
 func createCronHandler(c *fiber.Ctx) error {
 	input := CreateCronInput{}
 	if err := c.BodyParser(&input); err != nil {
-		fmt.Println("error = ", err)
-		return c.SendStatus(400)
+		return c.Status(400).SendString(err.Error())
 	}
 
 	err := input.Validate()
 	if err != nil {
-		fmt.Println("validation error = ", err)
-		return c.SendStatus(400)
+		return c.Status(400).SendString(err.Error())
 	}
 
-	taskScheduler, err := di.Inject(cron.TaskScheduleService{})
+	err = di.Invoke(func(cron cron.TaskScheduleService) {
+		cron.AddScript(input.Name, input.Cron, input.Snippet)
+	})
+
 	if err != nil {
-		fmt.Println("error injecting task scheduler", err)
-		return c.SendStatus(500)
+		return c.Status(500).SendString(err.Error())
 	}
-
-	taskScheduler.AddScript(input.Name, input.Cron, input.Snippet)
 
 	return renderCronList(c)
 }
@@ -42,28 +39,30 @@ func deleteCronHandler(c *fiber.Ctx) error {
 	id := c.Params("id", "")
 	cronId, err := strconv.Atoi(id)
 	if err != nil {
-		fmt.Println("no cron id found", id)
-		return c.SendStatus(400)
+		return c.Status(400).SendString("invalid id")
 	}
 
-	taskScheduler, err := di.Inject(cron.TaskScheduleService{})
+	err = di.Invoke(func(cron cron.TaskScheduleService) {
+		cron.Del(cronId)
+	})
+
 	if err != nil {
-		fmt.Println("error injecting task scheduler", err)
-		return c.SendStatus(500)
+		return c.Status(500).SendString(err.Error())
 	}
 
-	taskScheduler.Del(cronId)
 	return renderCronList(c)
 }
 
 func renderCronList(c *fiber.Ctx) error {
-	taskScheduler, err := di.Inject(cron.TaskScheduleService{})
+	crons := []cron.Cron{}
+	err := di.Invoke(func(cron cron.TaskScheduleService) {
+		crons = append(crons, cron.List()...)
+	})
+
 	if err != nil {
-		fmt.Println("error injecting task scheduler", err)
-		return c.SendStatus(500)
+		return c.Status(500).SendString(err.Error())
 	}
 
-	crons := taskScheduler.List()
 	props := fiber.Map{"Crons": crons, "Total": len(crons)}
 	return c.Render("partials/cron-list", props, "layouts/empty")
 }

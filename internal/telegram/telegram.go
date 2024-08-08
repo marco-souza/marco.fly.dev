@@ -98,14 +98,11 @@ func sendMsgWrapper(s *lua.State) int {
 
 	logger.Info("sending message", "message", message)
 
-	t, err := di.Inject(TelegramService{})
-	if err != nil {
-		logger.Error("failed to get telegram service", "err", err)
-		s.PushBoolean(false) // {false, channel, message}
-		return 1
-	}
+	err := di.Invoke(func(t TelegramService) {
+		t.SendChatMessage(message)
+	})
 
-	if err := t.SendChatMessage(message); err != nil {
+	if err != nil {
 		logger.Info("failed to send message", "message", message)
 		s.PushBoolean(false) // {false, channel, message}
 		return 1             // number of results
