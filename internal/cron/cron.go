@@ -23,24 +23,25 @@ type Cron struct {
 var logger = slog.With("service", "cron")
 
 type TaskScheduleService struct {
+	*lua.LuaService
+	*db.DatabaseService
 	scheduler   *cron.Cron
 	runningJobs runningCronJobs
-	db          *db.DatabaseService
 }
 
 func New() *TaskScheduleService {
-	dbs := di.MustInject(db.DatabaseService{})
 	location, err := time.LoadLocation("America/Sao_Paulo")
 	if err != nil {
 		panic(fmt.Errorf("error creating cron scheduler: %w", err))
 	}
 
-	scheduler := cron.New(cron.WithLocation(location))
+	di.Injectable(cron.New(cron.WithLocation(location)))
 
 	return &TaskScheduleService{
-		runningJobs: runningCronJobs{},
-		scheduler:   scheduler,
-		db:          dbs,
+		runningJobs:     runningCronJobs{},
+		scheduler:       di.MustInject(cron.Cron{}),
+		DatabaseService: di.MustInject(db.DatabaseService{}),
+		LuaService:      di.MustInject(lua.LuaService{}),
 	}
 }
 
@@ -80,7 +81,7 @@ func (tss *TaskScheduleService) AddScript(name, cronExpr, script string) error {
 	scriptHandler := func() {
 		logger.Info("executing cron job", "name", job.Name)
 
-		if _, err := lua.Run(job.Script); err != nil {
+		if _, err := tss.Run(job.Script); err != nil {
 			logger.Error("error executing cron job", "name", job.Name, "err", err)
 		}
 	}
@@ -97,7 +98,7 @@ func (tss *TaskScheduleService) AddScript(name, cronExpr, script string) error {
 func (tss *TaskScheduleService) List() []Cron {
 	crons := []Cron{}
 
-	entries, err := tss.db.Queries.ListCronJobs(tss.db.Ctx)
+	entries, err := tss.Queries.ListCronJobs(tss.Ctx)
 	if err != nil {
 		logger.Warn("error loading persisted cron jobs", "err", err)
 		return crons
@@ -120,7 +121,7 @@ func (tss *TaskScheduleService) List() []Cron {
 
 func (tss *TaskScheduleService) Del(id int) {
 	// remove from db
-	err := tss.db.Queries.DeleteCronJob(tss.db.Ctx, int64(id))
+	err := tss.Queries.DeleteCronJob(tss.Ctx, int64(id))
 	if err != nil {
 		logger.Warn("error deleting cron job", "err", err)
 		return

@@ -5,14 +5,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/marco-souza/marco.fly.dev/internal/lua"
 )
 
 // Setup scheduler by initializing cronjobs, registering lua scripts persisted
 func (tss *TaskScheduleService) registerPersistedJobs() error {
-	logger.Info("loading persisted cron jobs", "ctx", tss.db.Ctx, "q", tss.db.Queries)
-	crons, err := tss.db.Queries.ListCronJobs(tss.db.Ctx)
+	logger.Info("loading persisted cron jobs", "ctx", tss.Ctx, "q", tss.Queries)
+	crons, err := tss.Queries.ListCronJobs(tss.Ctx)
 	if err != nil {
 		logger.Error("error loading persisted cron jobs", "err", err)
 		return err
@@ -31,7 +29,7 @@ func (tss *TaskScheduleService) registerPersistedJobs() error {
 		cronHandler := func() {
 			logger.Info("executing cron job", "name", c.Name)
 
-			if _, err := lua.Run(c.Script); err != nil {
+			if _, err := tss.Run(c.Script); err != nil {
 				logger.Error("error executing cron job", "name", c.Name, "err", err)
 			}
 		}
@@ -93,7 +91,7 @@ func (tss *TaskScheduleService) registerLocalJobs(scriptFolder string) error {
 
 		if err := tss.register(localID, cronExpr, func() {
 			logger.Info("executing cron job", "name", name)
-			lua.Run(script) // ignore error
+			tss.Run(script) // ignore error
 		}); err != nil {
 			baseInt--
 			logger.Warn("error registering cron job", "name", name, "err", err)

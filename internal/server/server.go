@@ -17,6 +17,7 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/di"
 	"github.com/marco-souza/marco.fly.dev/internal/discord"
+	"github.com/marco-souza/marco.fly.dev/internal/lua"
 	"github.com/marco-souza/marco.fly.dev/internal/server/routes"
 	"github.com/marco-souza/marco.fly.dev/internal/telegram"
 )
@@ -67,10 +68,11 @@ func (s *server) Start(done *chan bool) {
 			config.Load,
 			db.New,
 			cache.New,
-			cron.New,
 			discord.New,
 			binance.New,
 			telegram.New,
+			lua.NewLuaService,
+			cron.New,
 		)
 
 		// listen for server events

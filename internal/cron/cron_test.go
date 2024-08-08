@@ -7,13 +7,17 @@ import (
 	"github.com/marco-souza/marco.fly.dev/internal/cron"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
 	"github.com/marco-souza/marco.fly.dev/internal/di"
+	"github.com/marco-souza/marco.fly.dev/internal/lua"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCronJob(t *testing.T) {
-	di.Injectable(config.Config{SqliteUrl: ":memory:"})
-	di.Injectable(db.New())
-	di.Injectable(cron.New())
+	di.Injectables(
+		config.Config{SqliteUrl: ":memory:"},
+		db.New,
+		lua.LuaService{},
+		cron.New,
+	)
 
 	taskScheduler := di.MustInject(cron.TaskScheduleService{})
 
