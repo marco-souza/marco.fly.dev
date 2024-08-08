@@ -7,9 +7,8 @@ import (
 
 func main() {
 	di.Injectable(server.New(nil))
-	s := di.MustInject(server.Server{})
 
-	if err := s.Run(); err != nil {
+	if err := di.Run(server.Server{}); err != nil {
 		di.Clean()
 		panic(err)
 	}

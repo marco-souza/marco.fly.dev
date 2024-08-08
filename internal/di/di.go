@@ -2,6 +2,7 @@ package di
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"reflect"
@@ -29,10 +30,9 @@ func Injectables(entities ...interface{}) {
 	}
 }
 
-func Injectable(entityPointer interface{}) {
+func Injectable(entityPointer interface{}) error {
 	if entityPointer == nil {
-		logger.Warn("entity is nil")
-		return
+		return errors.New("entity is nil")
 	}
 
 	// if poniter, get value
@@ -43,8 +43,7 @@ func Injectable(entityPointer interface{}) {
 
 	t := reflect.TypeOf(entity)
 	if val := ctx.Value(t); val != nil {
-		logger.Warn("entity already exists", "entity", t)
-		return
+		return errors.New("entity already exists")
 	}
 
 	// register the dependency
@@ -60,6 +59,25 @@ func Injectable(entityPointer interface{}) {
 		// register for teardown
 		teardownServices = append(teardownServices, d)
 	}
+
+	return nil
+}
+
+type Runner interface {
+	Run() error
+}
+
+func Run[T any](entity T) error {
+	instance := MustInject(entity)
+	if instance == nil {
+		return fmt.Errorf("dependency not found: %s", instance)
+	}
+
+	if runner, ok := reflect.ValueOf(instance).Interface().(Runner); ok {
+		return runner.Run()
+	}
+
+	return fmt.Errorf("entity is not a Runner: %s", instance)
 }
 
 func Invoke[F any](cb F) error {
