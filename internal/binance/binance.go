@@ -18,16 +18,23 @@ import (
 
 var logger = slog.With("service", "binance")
 
-func Start() {
-	logger.Info("starting binance service")
+type BinanceService struct {
+}
+
+func New() *BinanceService {
+	return &BinanceService{}
+}
+
+func (b *BinanceService) Start() error {
 	loadEnvs()
+	return nil
 }
 
-func Stop() {
-	logger.Info("stopping binance service")
+func (b *BinanceService) Stop() error {
+	return nil
 }
 
-func FetchAccountSnapshot(walletType string) (*AccountSnapshotResponse, error) {
+func (b *BinanceService) FetchAccountSnapshot(walletType string) (*AccountSnapshotResponse, error) {
 	req, err := http.NewRequest("GET", accountSnapURL, nil)
 	if err != nil {
 		logger.Error("error creating request", "err", err)
@@ -74,9 +81,9 @@ var pairMap = map[string]string{
 	"BNB": "BNBUSDT",
 }
 
-func GenerateWalletReport() (string, error) {
+func (b *BinanceService) GenerateWalletReport() (string, error) {
 	// fetch account snapshot
-	snapshot, err := FetchAccountSnapshot("SPOT")
+	snapshot, err := b.FetchAccountSnapshot("SPOT")
 	if err != nil {
 		logger.Error("error fetching account snapshot", "err", err)
 		return "", err
@@ -94,7 +101,7 @@ func GenerateWalletReport() (string, error) {
 		return "", err
 	}
 
-	usdRateTick, err := FetchTicker("BTCUSDT")
+	usdRateTick, err := b.FetchTicker("BTCUSDT")
 	if err != nil {
 		logger.Error("error fetching asset ticker ", "err", err)
 		return "", err
@@ -135,7 +142,7 @@ func GenerateWalletReport() (string, error) {
 				return "", fmt.Errorf("pair '%s' not found", balance.Asset)
 			}
 
-			t, err := FetchTicker(pair)
+			t, err := b.FetchTicker(pair)
 			if err != nil {
 				logger.Error("error fetching asset ticker ", "err", err, "pair", "BTC"+balance.Asset)
 				return "", err
@@ -199,7 +206,7 @@ func upOrDown(asset string, current float64) string {
 	return fmt.Sprintf("🔵 (%+4.3f%%)", percentage)
 }
 
-func FetchTicker(currencyPair string) (*Ticker, error) {
+func (b *BinanceService) FetchTicker(currencyPair string) (*Ticker, error) {
 	// API ref: https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker
 	req, err := http.NewRequest("GET", tickerURL, nil)
 	if err != nil {

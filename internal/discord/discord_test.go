@@ -8,8 +8,9 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	dc := discord.New()
+
 	t.Run("should create a new discord service", func(t *testing.T) {
-		service := discord.DiscordService
-		assert.NotNil(t, service)
+		assert.NotNil(t, dc)
 	})
 }

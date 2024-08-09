@@ -1,9 +1,15 @@
 package main
 
-import "github.com/marco-souza/marco.fly.dev/internal/server"
+import (
+	"github.com/marco-souza/marco.fly.dev/internal/di"
+	"github.com/marco-souza/marco.fly.dev/internal/server"
+)
 
 func main() {
-	s := server.New()
+	di.Injectable(server.New(nil))
 
-	s.Start(nil)
+	if err := di.Run(server.Server{}); err != nil {
+		di.Clean()
+		panic(err)
+	}
 }

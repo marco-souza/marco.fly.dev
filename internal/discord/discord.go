@@ -8,20 +8,20 @@ import (
 
 var logger = slog.With("discord")
 
-type discordService struct {
+type DiscordService struct {
 	session *discordgo.Session
 }
 
-func new() *discordService {
+func New() *DiscordService {
 	session, err := discordgo.New("Bot " + cfg.BotToken)
 	if err != nil {
 		panic(err)
 	}
 
-	return &discordService{session}
+	return &DiscordService{session}
 }
 
-func (d *discordService) SendMessage(channel, message string) error {
+func (d *DiscordService) SendMessage(channel, message string) error {
 	_, err := d.session.ChannelMessageSend(channel, message)
 	if err != nil {
 		logger.Error("error sending message", "err", err)
@@ -32,12 +32,10 @@ func (d *discordService) SendMessage(channel, message string) error {
 	return nil
 }
 
-func (d *discordService) Close() error {
+func (d *DiscordService) Stop() error {
 	return d.session.Close()
 }
 
-func (d *discordService) Open() error {
+func (d *DiscordService) Start() error {
 	return d.session.Open()
 }
-
-var DiscordService = new()

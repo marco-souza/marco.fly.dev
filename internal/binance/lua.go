@@ -4,9 +4,19 @@ import (
 	"strconv"
 
 	"github.com/Shopify/go-lua"
+	"github.com/marco-souza/marco.fly.dev/internal/di"
 )
 
-func fetchTicker(s *lua.State) int {
+type binanceLuaFuncs struct {
+	*BinanceService
+}
+
+func newBinanceLuaFuncs() *binanceLuaFuncs {
+	b := di.MustInject(BinanceService{})
+	return &binanceLuaFuncs{b}
+}
+
+func (blf *binanceLuaFuncs) fetchTicker(s *lua.State) int {
 	currencyPair, ok := s.ToString(1)
 	if !ok {
 		logger.Error("failed to get ticker", "pair", currencyPair)
@@ -16,7 +26,7 @@ func fetchTicker(s *lua.State) int {
 
 	logger.Info("fetching ticker for: " + currencyPair)
 
-	tick, err := FetchTicker(currencyPair)
+	tick, err := blf.FetchTicker(currencyPair)
 	if err != nil {
 		logger.Error("error fetching ticker", "err", err)
 		s.PushNil()
@@ -37,7 +47,7 @@ func fetchTicker(s *lua.State) int {
 	return 1
 }
 
-func fetchAccountSnapshot(s *lua.State) int {
+func (blf *binanceLuaFuncs) fetchAccountSnapshot(s *lua.State) int {
 	logger.Info("fetching account snapshot")
 
 	accType, ok := s.ToString(1)
@@ -47,7 +57,7 @@ func fetchAccountSnapshot(s *lua.State) int {
 		return 1
 	}
 
-	snapshot, err := FetchAccountSnapshot(accType)
+	snapshot, err := blf.FetchAccountSnapshot(accType)
 	if err != nil {
 		logger.Error("error fetching account snapshot", "err", err)
 		s.PushNil()
@@ -59,10 +69,10 @@ func fetchAccountSnapshot(s *lua.State) int {
 	return 1
 }
 
-func generateWalletReport(s *lua.State) int {
+func (blf *binanceLuaFuncs) generateWalletReport(s *lua.State) int {
 	logger.Info("generating wallet report")
 
-	report, err := GenerateWalletReport()
+	report, err := blf.GenerateWalletReport()
 	if err != nil {
 		logger.Error("error generating wallet report", "err", err)
 		s.PushNil()
@@ -77,16 +87,18 @@ func generateWalletReport(s *lua.State) int {
 func PushClient(l *lua.State) {
 	l.NewTable()
 
+	f := newBinanceLuaFuncs()
+
 	l.PushString("pair_price")
-	l.PushGoFunction(fetchTicker)
+	l.PushGoFunction(f.fetchTicker)
 	l.SetTable(-3)
 
 	l.PushString("account_snapshot")
-	l.PushGoFunction(fetchAccountSnapshot)
+	l.PushGoFunction(f.fetchAccountSnapshot)
 	l.SetTable(-3)
 
 	l.PushString("wallet_report")
-	l.PushGoFunction(generateWalletReport)
+	l.PushGoFunction(f.generateWalletReport)
 	l.SetTable(-3)
 
 	l.SetGlobal("binance")
