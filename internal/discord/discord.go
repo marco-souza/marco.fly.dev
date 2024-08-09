@@ -6,7 +6,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var logger = slog.With("discord")
+var logger = slog.With("service", "discord")
 
 type DiscordService struct {
 	session *discordgo.Session

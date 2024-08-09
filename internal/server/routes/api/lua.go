@@ -18,7 +18,7 @@ func luaHandler(c *fiber.Ctx) error {
 
 	logger.Info("lua code", "snippet", snippet)
 	code := ""
-	err := di.Invoke(func(l *lua.LuaService) error {
+	err := di.Invoke(func(l lua.LuaService) error {
 		output, err := l.Run(snippet)
 		code = output
 		return err

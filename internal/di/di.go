@@ -101,7 +101,13 @@ func Invoke[F any](cb F) error {
 	}
 
 	// call db with deps
-	result := reflect.ValueOf(cb).Call(deps)[0]
+	returns := reflect.ValueOf(cb).Call(deps)
+
+	if len(returns) == 0 {
+		return nil
+	}
+
+	result := returns[0]
 	if result.IsNil() {
 		return nil
 	}
