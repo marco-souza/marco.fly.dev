@@ -1,7 +1,9 @@
 package db_test
 
 import (
+	"database/sql"
 	"testing"
+	"time"
 
 	"github.com/marco-souza/marco.fly.dev/internal/config"
 	"github.com/marco-souza/marco.fly.dev/internal/db"
@@ -88,4 +90,83 @@ func TestDbClient(t *testing.T) {
 		assert.Equal(t, crons[0].Expression, cronToInsert.Expression)
 		assert.Equal(t, crons[0].Script, cronToInsert.Script)
 	})
+
+	date := time.Now().Truncate(time.Second)
+
+	// create test for funancial_logs
+	t.Run("create financial log", func(t *testing.T) {
+		// create financial log
+		financialLogToInsert := sqlc.CreateFinancialLogParams{
+			Amount:      100,
+			Currency:    "BRL",
+			Investiment: "test",
+			CreatedAt:   sql.NullTime{Time: date, Valid: true},
+		}
+
+		insertedFinancialLog, err := ds.Queries.CreateFinancialLog(ds.Ctx, financialLogToInsert)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, insertedFinancialLog)
+
+		// assert CreateFinancialLogParams
+		assert.Equal(t, financialLogToInsert.Amount, insertedFinancialLog.Amount)
+		assert.Equal(t, financialLogToInsert.Currency, insertedFinancialLog.Currency)
+		assert.Equal(t, financialLogToInsert.Investiment, insertedFinancialLog.Investiment)
+		assert.Equal(t, insertedFinancialLog.ID, int64(1))
+		assert.Equal(t, insertedFinancialLog.CreatedAt.Time.UTC(), date.UTC())
+	})
+
+	t.Run("fetch financial log", func(t *testing.T) {
+		// fetch inserted financial log
+		financialLog, err := ds.Queries.GetFinancialLog(ds.Ctx, 1)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, financialLog)
+
+		assert.Equal(t, financialLog.Amount, int64(100))
+		assert.Equal(t, financialLog.Currency, "BRL")
+		assert.Equal(t, financialLog.Investiment, "test")
+		assert.Equal(t, financialLog.ID, int64(1))
+	})
+
+	t.Run("update financial log", func(t *testing.T) {
+		// update financial log
+		newAmount := int64(200)
+		financialLogUpdatePayload := sqlc.UpdateFinancialLogParams{
+			ID:          1,
+			Amount:      newAmount,
+			Currency:    "BRL",
+			Investiment: "test",
+		}
+
+		financialLog, err := ds.Queries.UpdateFinancialLog(ds.Ctx, financialLogUpdatePayload)
+		assert.NoError(t, err)
+
+		assert.NotNil(t, financialLog)
+		assert.Equal(t, financialLog.Amount, newAmount)
+	})
+
+	t.Run("list financial logs", func(t *testing.T) {
+		// listing financial logs
+		financialLogs, err := ds.Queries.ListFinancialLogs(ds.Ctx)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, financialLogs)
+
+		// assert ListFinancialLogs
+		assert.Len(t, financialLogs, 1)
+		assert.Equal(t, financialLogs[0].ID, int64(1))
+		assert.Equal(t, financialLogs[0].Amount, int64(200))
+		assert.Equal(t, financialLogs[0].Currency, "BRL")
+		assert.Equal(t, financialLogs[0].Investiment, "test")
+	})
+
+	t.Run("delete financial log", func(t *testing.T) {
+		// delete financial log
+		financialLog, err := ds.Queries.DeleteFinancialLog(ds.Ctx, 1)
+		assert.NoError(t, err)
+
+		_, err = ds.Queries.GetFinancialLog(ds.Ctx, financialLog.ID)
+		assert.Error(t, err)
+	})
+
 }
